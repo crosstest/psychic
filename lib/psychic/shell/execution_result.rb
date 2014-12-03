@@ -12,6 +12,8 @@ module Psychic
       attr_reader :stderr
       # coerce_value String, ->(v) { v.force_encoding('utf-8') }
 
+      include Psychic::Util::Hashable
+
       def initialize(results)
         @exitstatus = results.fetch(:exitstatus)
         # Needs to be UTF-8 to serialize as YAML

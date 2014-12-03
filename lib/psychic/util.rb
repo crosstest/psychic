@@ -2,6 +2,13 @@ module Psychic
   autoload :RegexpTokenHandler, 'psychic/tokens'
   autoload :MustacheTokenHandler, 'psychic/tokens'
   class Util
+    module Hashable
+      def to_hash
+        instance_variables.each_with_object({}) do |var,hash|
+          hash[var.to_s.delete("@")] = instance_variable_get(var)
+        end
+      end
+    end
     # Returns a new Hash with all key values coerced to strings. All keys
     # within a Hash are coerced by calling #to_s and hashes with arrays
     # and other hashes are traversed.
