@@ -1,6 +1,5 @@
 require 'psychic/runner/version'
 
-autoload :Mustache, 'mustache'
 autoload :YAML, 'yaml'
 
 module Psychic
@@ -9,6 +8,7 @@ module Psychic
   autoload :Shell,  'psychic/shell'
   class Runner
     autoload :BaseRunner, 'psychic/runner/base_runner'
+    autoload :SampleRunner, 'psychic/runner/sample_runner'
     autoload :HotRunner, 'psychic/runner/hot_runner'
     autoload :CompoundRunner, 'psychic/runner/compound_runner'
     autoload :ColdRunnerRegistry, 'psychic/runner/cold_runner_registry'
@@ -16,6 +16,7 @@ module Psychic
     ColdRunnerRegistry.autoload_runners!
 
     include BaseRunner
+    include SampleRunner
     attr_reader :runners, :hot_runner, :cold_runners
 
     def initialize(opts = { cwd: Dir.pwd })

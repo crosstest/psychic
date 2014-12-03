@@ -4,8 +4,8 @@ require 'psychic/runner'
 module Psychic
   class CLI < Thor
     desc 'run_task <name>', 'Executes a custom task by name'
-    def run_task(task_name)
-      result = runner.execute_task(task_name)
+    def run_task(task_name, *args)
+      result = runner.execute_task(task_name, *args)
       result.error!
       say_status :success, task_name
     rescue Psychic::Shell::ExecutionError => e
@@ -14,8 +14,8 @@ module Psychic
     end
 
     desc 'run_sample <name>', 'Executes a code sample'
-    def run_sample(sample_name)
-      result = runner.run_sample(sample_name)
+    def run_sample(sample_name, *args)
+      result = runner.run_sample(sample_name, *args)
       result.error!
       say_status :success, sample_name
     rescue Errno::ENOENT => e

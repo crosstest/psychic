@@ -18,9 +18,15 @@ module Psychic
           task = task_name.to_s
           script = Dir["#{@cwd}/scripts/#{task}{.sh,}"].first
           if script
-            script = Psychic::Util.relativize(script, @cwd)
-            "./#{script}" unless script.to_s.start_with? '/'
+            cmd = Psychic::Util.relativize(script, @cwd)
+            cmd = [cmd, args_for_task(task_name)].compact.join(' ')
+            "./#{cmd}" unless cmd.to_s.start_with? '/'
           end
+        end
+
+        def args_for_task(task)
+          # HACK: Need a better way to deal with args
+          '{{sample_file}}' if task == 'run_sample'
         end
 
         def active?

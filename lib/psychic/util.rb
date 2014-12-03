@@ -1,4 +1,6 @@
 module Psychic
+  autoload :RegexpTokenHandler, 'psychic/tokens'
+  autoload :MustacheTokenHandler, 'psychic/tokens'
   class Util
     # Returns a new Hash with all key values coerced to strings. All keys
     # within a Hash are coerced by calling #to_s and hashes with arrays
@@ -37,18 +39,12 @@ module Psychic
       FileFinder.new(search_path, ignored_patterns).find_file(file_alias)
     end
 
-    def self.replace_tokens(template, variables)
-      TokenHandler.new(template).replace(variables)
-    end
-  end
-
-  class TokenHandler
-    def initialize(template)
-      @template = template
-    end
-
-    def replace(variables = {})
-      Mustache.render(@template, variables)
+    def self.replace_tokens(template, variables, token_regexp = nil, token_replacement = nil)
+      if token_regexp.nil?
+        MustacheTokenHandler.new(template).replace(variables)
+      else
+        RegexpTokenHandler.new(template, token_regexp, token_replacement).replace(variables)
+      end
     end
   end
 
@@ -73,7 +69,7 @@ module Psychic
       file = files.min_by(&:length)
 
       fail Errno::ENOENT, "No file was found for #{name} within #{search_path}" if file.nil?
-      Pathname.new file
+      Psychic::Util.relativize(file, search_path)
     end
 
     def potential_files(name)
@@ -82,12 +78,6 @@ module Psychic
       potential_files = Dir.glob(glob_string, File::FNM_CASEFOLD)
       potential_files.concat Dir.glob(glob_string.gsub('_', '-'), File::FNM_CASEFOLD)
       potential_files.concat Dir.glob(glob_string.gsub('_', ''), File::FNM_CASEFOLD)
-    end
-
-    def relativize(file, base_path)
-      absolute_file = File.absolute_path(file)
-      absolute_base_path = File.absolute_path(base_path)
-      Pathname.new(absolute_file).relative_path_from Pathname.new(absolute_base_path)
     end
 
     private
@@ -109,7 +99,7 @@ module Psychic
         started_with_slash = pattern.start_with? '/'
 
         pattern.gsub!(%r{\A/}, '') # remove leading slashes since we're searching from root
-        file = relativize(target_file, search_path)
+        file = Psychic::Util.relativize(target_file, search_path)
         ignored = file.fnmatch? pattern
         ignored || (file.fnmatch? "**/#{pattern}" unless started_with_slash)
       end

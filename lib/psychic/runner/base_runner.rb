@@ -25,6 +25,7 @@ module Psychic
 
       def initialize(opts = {})
         opts[:cwd] ||= Dir.pwd
+        @logger = opts[:logger] || new_logger
         @cwd = opts[:cwd]
         @opts = opts
       end
@@ -42,21 +43,10 @@ module Psychic
 
       # Reserved words
 
-      def run_sample(code_sample)
-        sample_file = Psychic::Util.find_file_by_alias(code_sample, cwd)
-        command = command_for_task('run_sample') || sample_file
-        if command
-          variables = { sample: code_sample, sample_file: sample_file }
-          command = Psychic::Util.replace_tokens(command, variables)
-          shell.execute(command, @opts)
-        else
-          # Try to run the file directly
-          shell.execute(sample_file)
-        end
-      end
-
       def execute(command, *args)
-        shell.execute(command, *args, @opts)
+        full_cmd = [command, *args].join(' ')
+        logger.info("Executing #{full_cmd}")
+        shell.execute(full_cmd, @opts)
       end
 
       def command_for_task(task, *_args)
@@ -67,7 +57,7 @@ module Psychic
       def execute_task(task, *args)
         command = command_for_task(task, *args)
         fail Psychic::Runner::TaskNotImplementedError if command.nil?
-        execute(command)
+        execute(command, *args)
       end
 
       def active?
