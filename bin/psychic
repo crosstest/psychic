@@ -1,0 +1,4 @@
+#!/usr/bin/env ruby
+require 'psychic/cli'
+
+Psychic::CLI.start
