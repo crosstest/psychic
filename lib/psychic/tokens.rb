@@ -12,7 +12,7 @@ module Psychic
       @template.scan(@token_pattern).flatten.uniq
     end
 
-    def replace(variables = {})
+    def render(variables = {})
       @template.gsub(@token_pattern) do
         full_match = Regexp.last_match[0]
         key = Regexp.last_match[1]
@@ -32,7 +32,7 @@ module Psychic
       @template.tags
     end
 
-    def replace(variables = {})
+    def render(variables = {})
       Mustache.render(@template, variables)
     end
   end

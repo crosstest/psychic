@@ -24,10 +24,15 @@ module Psychic
       end
 
       def initialize(opts = {})
-        opts[:cwd] ||= Dir.pwd
+        # Make sure to delete any option that isn't a MixLib::ShellOut option
+        @cwd = opts[:cwd] ||= Dir.pwd
         @logger = opts[:logger] || new_logger
-        @cwd = opts[:cwd]
-        @opts = opts
+        @cli = opts.delete :cli
+        @parameters = opts.delete :parameters
+        @parameters ||= {}
+        @interactive_mode = opts.delete :interactive
+        @parameter_mode = opts.delete :parameter_mode
+        @shell_opts = opts.select { |key, _value| Psychic::Shell::AVAILABLE_OPTIONS.include? key }
       end
 
       def respond_to_missing?(task, include_all = false)
@@ -46,7 +51,7 @@ module Psychic
       def execute(command, *args)
         full_cmd = [command, *args].join(' ')
         logger.info("Executing #{full_cmd}")
-        shell.execute(full_cmd, @opts)
+        shell.execute(full_cmd, @shell_opts)
       end
 
       def command_for_task(task, *_args)

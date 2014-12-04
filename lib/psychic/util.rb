@@ -4,8 +4,8 @@ module Psychic
   class Util
     module Hashable
       def to_hash
-        instance_variables.each_with_object({}) do |var,hash|
-          hash[var.to_s.delete("@")] = instance_variable_get(var)
+        instance_variables.each_with_object({}) do |var, hash|
+          hash[var.to_s.delete('@')] = instance_variable_get(var)
         end
       end
     end
@@ -30,6 +30,20 @@ module Psychic
       end
     end
 
+    def self.symbolized_hash(obj)
+      if obj.is_a?(Hash)
+        obj.each_with_object({}) do |(k, v), h|
+          h[k.to_sym] = symbolized_hash(v)
+        end
+      elsif obj.is_a?(Array)
+        obj.each_with_object([]) do |e, a|
+          a << symbolized_hash(e)
+        end
+      else
+        obj
+      end
+    end
+
     def self.relativize(file, base_path)
       absolute_file = File.absolute_path(file)
       absolute_base_path = File.absolute_path(base_path)
@@ -48,9 +62,9 @@ module Psychic
 
     def self.replace_tokens(template, variables, token_regexp = nil, token_replacement = nil)
       if token_regexp.nil?
-        MustacheTokenHandler.new(template).replace(variables)
+        MustacheTokenHandler.new(template).render(variables)
       else
-        RegexpTokenHandler.new(template, token_regexp, token_replacement).replace(variables)
+        RegexpTokenHandler.new(template, token_regexp, token_replacement).render(variables)
       end
     end
   end

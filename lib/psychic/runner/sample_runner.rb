@@ -3,11 +3,10 @@ module Psychic
     module SampleRunner
       def run_sample(code_sample, *args)
         sample_file = Psychic::Util.find_file_by_alias(code_sample, cwd)
-        process_template(sample_file) if templated?
-        command = command_for_task('run_sample')
+        absolute_sample_file = File.expand_path(sample_file, cwd)
+        process_parameters(absolute_sample_file)
+        command = build_command(code_sample, sample_file)
         if command
-          variables = { sample: code_sample, sample_file: sample_file }
-          command = Psychic::Util.replace_tokens(command, variables)
           execute(command, *args)
         else
           run_sample_file(sample_file)
@@ -18,32 +17,71 @@ module Psychic
         execute("./#{sample_file}", *args) # Assuming Bash, but should detect Windows and use PowerShell
       end
 
-      def process_template(sample_file)
-        absolute_sample_file = File.expand_path(sample_file, cwd)
-        template = File.read(absolute_sample_file)
-        # Default token pattern/replacement (used by php-opencloud) should be configurable
-        content = Psychic::Util.replace_tokens(template, variables, /'\{(\w+)\}'/, "'\\1'")
+      def process_parameters(sample_file)
+        if templated?
+          backup_and_overwrite(sample_file)
 
-        # Backup and overwrite
-        backup_file = "#{absolute_sample_file}.bak"
-        fail 'Please clear out old backups before rerunning' if File.exist? backup_file
-        FileUtils.cp(absolute_sample_file, backup_file)
-        File.write(absolute_sample_file, content)
+          template = File.read(sample_file)
+          # Default token pattern/replacement (used by php-opencloud) should be configurable
+          token_handler = RegexpTokenHandler.new(template, /'\{(\w+)\}'/, "'\\1'")
+          confirm_or_update_parameters(token_handler.tokens)
+          File.write(sample_file, token_handler.render(@parameters))
+        end
       end
 
       def templated?
-        # Probably not the best way to turn this on/off
-        true unless variables.nil?
+        @parameter_mode == 'tokens'
       end
 
-      def variables
-        # ... or
-        variables_file = Dir["#{cwd}/psychic-variables.{yaml,yml}"].first
-        return nil unless variables_file
-        environment_variables = ENV.to_hash
-        environment_variables.merge!(@opts[:env]) if @opts[:env]
-        variables = Psychic::Util.replace_tokens(File.read(variables_file), environment_variables)
-        YAML.load(variables)
+      def interactive?
+        !@interactive_mode.nil?
+      end
+
+      protected
+
+      def build_command(code_sample, sample_file)
+        command = command_for_task('run_sample')
+        return nil if command.nil?
+
+        command_params = { sample: code_sample, sample_file: sample_file }
+        command_params.merge!(@parameters) unless @parameters.nil?
+        Psychic::Util.replace_tokens(command, command_params)
+      end
+
+      def backup_and_overwrite(file)
+        backup_file = "#{file}.bak"
+        if File.exist? backup_file
+          if should_restore?(file)
+            FileUtils.mv(backup_file, file)
+          else
+            fail 'Please clear out old backups before rerunning' if File.exist? backup_file
+          end
+        end
+        FileUtils.cp(file, backup_file)
+      end
+
+      def should_restore?(file, orig)
+        if interactive?
+          @cli.yes? "Would you like to #{file} to #{orig} before running the sample?"
+        end
+      end
+
+      def prompt(key)
+        return unless interactive?
+        value = @parameters[key]
+        if value
+          return unless @interactive_mode == 'always'
+          new_value = @cli.ask "Please set a value for #{key} (or enter to confirm #{value.inspect}): "
+          new_value.empty? ? value : new_value
+        else
+          @cli.ask "Please set a value for #{key}: "
+        end
+      end
+
+      def confirm_or_update_parameters(required_parameters)
+        required_parameters.each do | key |
+          @parameters[key] = prompt(key)
+        end
       end
     end
   end
