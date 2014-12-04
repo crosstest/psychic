@@ -51,10 +51,10 @@ module Psychic
       def backup_and_overwrite(file)
         backup_file = "#{file}.bak"
         if File.exist? backup_file
-          if should_restore?(file)
+          if should_restore?(backup_file, file)
             FileUtils.mv(backup_file, file)
           else
-            fail 'Please clear out old backups before rerunning' if File.exist? backup_file
+            abort 'Please clear out old backups before rerunning' if File.exist? backup_file
           end
         end
         FileUtils.cp(file, backup_file)
@@ -67,10 +67,8 @@ module Psychic
       end
 
       def prompt(key)
-        return unless interactive?
-        value = @parameters[key]
         if value
-          return unless @interactive_mode == 'always'
+          return value unless @interactive_mode == 'always'
           new_value = @cli.ask "Please set a value for #{key} (or enter to confirm #{value.inspect}): "
           new_value.empty? ? value : new_value
         else
@@ -81,7 +79,7 @@ module Psychic
       def confirm_or_update_parameters(required_parameters)
         required_parameters.each do | key |
           @parameters[key] = prompt(key)
-        end
+        end if interactive?
       end
     end
   end

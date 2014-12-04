@@ -5,7 +5,6 @@ require 'psychic/runner'
 module Psychic
   class CLI < Thor
     BUILT_IN_TASKS = %w(bootstrap)
-    DEFAULT_PARAMS_FILE = 'psychic-parameters.yaml'
 
     class << self
       # Override Thor's start to strip extra_args from ARGV before it's processed
@@ -48,19 +47,31 @@ module Psychic
     method_option :interactive, desc: 'Prompt for parameters?', enum: %w(always missing), lazy_default: 'missing'
     method_option :parameters, desc: 'YAML file containing key/value parameters. Default: psychic-parameters.yaml'
     method_option :parameter_mode, desc: 'How should the parameters be passed?', enum: %w(tokens arguments env)
+    method_option :dry_run, desc: 'Do not execute - just show what command would be run', lazy_default: true
     # rubocop:enable Metrics/LineLength
     def sample(*sample_names)
       sample_names.each do | sample_name |
         say_status :executing, sample_name
-        result = runner.run_sample(sample_name, *extra_args)
-        result.error!
-        say_status :success, sample_name
+        begin
+          run_sample sample_name
+        rescue Errno::ENOENT
+          say_status :failed, "No code sample found for #{sample_name}", :red
+          # TODO: Fail on missing? Fail fast?
+        end
       end
-    rescue Errno::ENOENT
-      say_status :failed, "No code sample found for #{sample_name}", :red
     end
 
     private
+
+    def run_sample(sample_name)
+      result = runner.run_sample(sample_name, *extra_args)
+      if options.dry_run
+        say_status :dry_run, sample_name
+      else
+        result.error!
+        say_status :success, sample_name
+      end
+    end
 
     def runner
       parameters_file = options.parameters
@@ -74,13 +85,5 @@ module Psychic
       )
       @runner ||= Psychic::Runner.new(runner_opts)
     end
-
-    def load_parameters_file(file)
-      environment_variables = ENV.to_hash
-      parameters = Psychic::Util.replace_tokens(File.read(file), environment_variables)
-      YAML.load(parameters)
-    end
   end
 end
-
-# require 'psychic/commands/exec'
