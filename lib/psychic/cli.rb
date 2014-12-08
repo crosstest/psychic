@@ -74,14 +74,8 @@ module Psychic
     end
 
     def runner
-      parameters_file = options.parameters
-      parameters_file ||= 'psychic-parameters.yaml' if File.exist? DEFAULT_PARAMS_FILE
-      if parameters_file
-        fail "Parameter file #{parameters_file} does not exist" unless File.exist? parameters_file
-        parameters = load_parameters_file(parameters_file)
-      end
       runner_opts = Util.symbolized_hash(options).merge(
-        cwd: Dir.pwd, cli: shell, parameters: parameters
+        cwd: Dir.pwd, cli: shell, parameters: options.parameters
       )
       @runner ||= Psychic::Runner.new(runner_opts)
     end

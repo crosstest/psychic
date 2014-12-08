@@ -1,8 +1,12 @@
 module Psychic
   class Runner
     module SampleRunner
+      def find_sample(code_sample)
+        find_in_hints(code_sample) || Psychic::Util.find_file_by_alias(code_sample, cwd)
+      end
+
       def run_sample(code_sample, *args)
-        sample_file = Psychic::Util.find_file_by_alias(code_sample, cwd)
+        sample_file = find_sample(code_sample)
         absolute_sample_file = File.expand_path(sample_file, cwd)
         process_parameters(absolute_sample_file)
         command = build_command(code_sample, sample_file)
@@ -39,6 +43,14 @@ module Psychic
 
       protected
 
+      def find_in_hints(code_sample)
+        return unless hints['samples']
+        hints['samples'].each do |k, v|
+          return v if k.downcase == code_sample.downcase
+        end
+        nil
+      end
+
       def build_command(code_sample, sample_file)
         command = command_for_task('run_sample')
         return nil if command.nil?
@@ -60,7 +72,8 @@ module Psychic
         FileUtils.cp(file, backup_file)
       end
 
-      def should_restore?(file, orig)
+      def should_restore?(file, orig, timing = :before)
+        return true if [timing, 'always']. include? restore_mode
         if interactive?
           @cli.yes? "Would you like to #{file} to #{orig} before running the sample?"
         end
