@@ -73,7 +73,7 @@ module Psychic
       end
 
       def should_restore?(file, orig, timing = :before)
-        return true if [timing, 'always']. include? restore_mode
+        return true if [timing, 'always']. include? @restore_mode
         if interactive?
           @cli.yes? "Would you like to #{file} to #{orig} before running the sample?"
         end
