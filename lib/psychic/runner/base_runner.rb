@@ -36,8 +36,8 @@ module Psychic
         @logger = opts[:logger] || new_logger
         @env = opts[:env] || ENV.to_hash
         @parameters = load_parameters(opts[:parameters])
-        @cli, @interactive_mode = opts[:cli], opts[:interactive]
-        @parameter_mode, @restore_mode, @dry_run = opts[:parameter_mode], opts[:restore_mode], opts[:dry_run]
+        @cli, @interactive_mode, @parameter_mode, @restore_mode, @dry_run = opts.values_at(
+          :cli, :interactive, :parameter_mode, :restore_mode, :dry_run)
         # Make sure to delete any option that isn't a MixLib::ShellOut option
         @shell_opts = opts.select { |key, _| Psychic::Shell::AVAILABLE_OPTIONS.include? key }
       end
