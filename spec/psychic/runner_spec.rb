@@ -3,7 +3,7 @@ require 'spec_helper'
 module Psychic
   RSpec.describe Runner do
     subject { described_class.new(cwd: current_dir) }
-    context 'when psychic-hints.yml exists' do
+    context 'when psychic.yml exists' do
       let(:hints) do
         {
           'tasks' =>
@@ -16,7 +16,7 @@ module Psychic
       end
 
       before(:each) do
-        write_file 'psychic-hints.yml', YAML.dump(hints)
+        write_file 'psychic.yml', YAML.dump(hints)
       end
 
       describe 'initialize' do

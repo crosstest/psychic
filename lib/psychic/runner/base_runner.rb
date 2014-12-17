@@ -83,7 +83,7 @@ module Psychic
       private
 
       def load_hints
-        hints_file = Dir["#{@cwd}/psychic-hints.{yaml,yml}"].first
+        hints_file = Dir["#{@cwd}/psychic.{yaml,yml}"].first
         YAML.load(File.read(hints_file)) unless hints_file.nil?
       end
 

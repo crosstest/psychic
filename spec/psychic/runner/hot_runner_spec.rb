@@ -40,12 +40,12 @@ module Psychic
         end
       end
 
-      context 'task map stored in psychic-hints.yml' do
+      context 'task map stored in psychic.yml' do
         let(:hints) do
           { 'tasks' => task_map }
         end
         before(:each) do
-          write_file 'psychic-hints.yml', YAML.dump(hints)
+          write_file 'psychic.yml', YAML.dump(hints)
         end
         subject { described_class.new(cwd: current_dir) }
         include_examples 'runs tasks'
