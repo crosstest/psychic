@@ -21,6 +21,7 @@ module Psychic
 
     def initialize(opts = { cwd: Dir.pwd })
       fail 'cwd is required' unless opts[:cwd]
+      opts[:cwd] = Pathname(opts[:cwd]).to_s # must be a string on windows...
       super
       @hot_runner = HotRunner.new(opts)
       @cold_runners = ColdRunnerRegistry.active_runners(opts)
