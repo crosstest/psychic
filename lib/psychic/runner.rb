@@ -8,6 +8,8 @@ module Psychic
   autoload :Shell,  'psychic/shell'
   class Runner
     autoload :BaseRunner, 'psychic/runner/base_runner'
+    autoload :CodeSample, 'psychic/runner/code_sample'
+    autoload :SampleFinder, 'psychic/runner/sample_finder'
     autoload :SampleRunner, 'psychic/runner/sample_runner'
     autoload :HotRunner, 'psychic/runner/hot_runner'
     autoload :CompoundRunner, 'psychic/runner/compound_runner'
@@ -24,9 +26,14 @@ module Psychic
       opts[:cwd] = Pathname(opts[:cwd]).to_s # must be a string on windows...
       super
       @hot_runner = HotRunner.new(opts)
+      @sample_finder = SampleFinder.new(opts[:cwd], @hot_runner.hints['samples'])
       @cold_runners = ColdRunnerRegistry.active_runners(opts)
       @runners = [@hot_runner, @cold_runners].flatten
       @known_tasks = @runners.flat_map(&:known_tasks).uniq
+    end
+
+    def known_samples
+      @sample_finder.known_samples
     end
 
     def [](task_name)

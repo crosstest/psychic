@@ -2,7 +2,7 @@ module Psychic
   class Runner
     module SampleRunner
       def find_sample(code_sample)
-        find_in_hints(code_sample) || Psychic::Util.find_file_by_alias(code_sample, cwd)
+        @sample_finder.find_sample(code_sample)
       end
 
       def run_sample(code_sample, *args)

@@ -1,0 +1,35 @@
+module Psychic
+  class Runner
+    class SampleFinder
+      attr_accessor :hints
+
+      def initialize(search_dir = Dir.pwd, hints = nil)
+        @search_dir = search_dir
+        @hints = hints || {}
+      end
+
+      def known_samples
+        hints.map do | name, file |
+          CodeSample.new(name, file)
+        end
+      end
+
+      def find_sample(name)
+        file = find_in_hints(name) || Psychic::Util.find_file_by_alias(name, @search_dir)
+        CodeSample.new(name, file)
+      end
+
+      # Find multiple samples by a regex or glob pattern
+      # def find_samples(pattern)
+      # end
+
+      private
+
+      def find_in_hints(name)
+        hints.each do |k, v|
+          return v if k.downcase == name.downcase
+        end
+      end
+    end
+  end
+end
