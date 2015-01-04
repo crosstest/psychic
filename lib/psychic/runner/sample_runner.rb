@@ -13,7 +13,7 @@ module Psychic
         if command
           execute(command, *args)
         else
-          run_sample_file(sample_file)
+          run_sample_file(sample_file, *args)
         end
       end
 
