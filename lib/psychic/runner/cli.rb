@@ -1,10 +1,16 @@
+require 'psychic/cli'
 require 'psychic/runner'
 
 module Psychic
-  module Runner
+  class Runner
     class CLI < Psychic::CLI
       desc 'task <name>', 'Executes any task by name'
-      def task(task_name)
+      method_option :list, aliases: '-l', desc: 'List known tasks'
+      method_option :verbose, aliases: '-v', desc: 'Verbose: display more details'
+      method_option :cwd, desc: 'Working directory for detecting and running commands'
+      def task(task_name = nil)
+        return list_tasks if options[:list]
+        abort 'You must specify a task name, run with -l for a list of known tasks'
         result = runner.execute_task(task_name, *extra_args)
         result.error!
         say_status :success, task_name
@@ -39,6 +45,21 @@ module Psychic
         end
       end
 
+      no_commands do
+        def list_tasks
+          runner.known_tasks.map do |task|
+            task_id = set_color(task, :bold)
+            if options[:verbose]
+              details = runner[task]
+              details = "\n#{details}".lines.join('  ') if details.lines.size > 1
+              say "#{task_id}: #{details}"
+            else
+              say "  #{task_id}"
+            end
+          end
+        end
+      end
+
       private
 
       def run_sample(sample_name)
@@ -52,10 +73,13 @@ module Psychic
       end
 
       def runner
-        runner_opts = Util.symbolized_hash(options).merge(
-          cwd: Dir.pwd, cli: shell, parameters: options.parameters
-        )
-        @runner ||= Psychic::Runner.new(runner_opts)
+        @runner ||= setup_runner
+      end
+
+      def setup_runner
+        runner_opts = { cwd: Dir.pwd, cli: shell, parameters: options.parameters }
+        runner_opts.merge!(Util.symbolized_hash(options))
+        Psychic::Runner.new(runner_opts)
       end
     end
   end

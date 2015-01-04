@@ -1,4 +1,4 @@
 #!/usr/bin/env ruby
 require 'psychic/runner/cli'
 
-Psychic::CLI.start
+Psychic::Runner::CLI.start

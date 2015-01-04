@@ -26,7 +26,7 @@ module Psychic
       @hot_runner = HotRunner.new(opts)
       @cold_runners = ColdRunnerRegistry.active_runners(opts)
       @runners = [@hot_runner, @cold_runners].flatten
-      @known_tasks = @runners.map(&:known_tasks).uniq
+      @known_tasks = @runners.flat_map(&:known_tasks).uniq
     end
 
     def [](task_name)
