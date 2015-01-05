@@ -1,4 +1,5 @@
 require 'psychic/runner/version'
+require 'thor'
 
 autoload :YAML, 'yaml'
 
@@ -6,6 +7,7 @@ module Psychic
   autoload :Util,   'psychic/util'
   autoload :Logger, 'psychic/logger'
   autoload :Shell,  'psychic/shell'
+  autoload :OutputHelper, 'psychic/output_helper'
   class Runner
     autoload :BaseRunner, 'psychic/runner/base_runner'
     autoload :CodeSample, 'psychic/runner/code_sample'

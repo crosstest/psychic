@@ -10,13 +10,13 @@ module Psychic
 
       def known_samples
         hints.map do | name, file |
-          CodeSample.new(name, file)
+          CodeSample.new(name, file, @search_dir)
         end
       end
 
       def find_sample(name)
         file = find_in_hints(name) || Psychic::Util.find_file_by_alias(name, @search_dir)
-        CodeSample.new(name, file)
+        CodeSample.new(name, file, @search_dir)
       end
 
       # Find multiple samples by a regex or glob pattern
@@ -29,6 +29,7 @@ module Psychic
         hints.each do |k, v|
           return v if k.downcase == name.downcase
         end
+        nil
       end
     end
   end

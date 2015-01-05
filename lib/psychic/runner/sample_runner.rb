@@ -5,11 +5,12 @@ module Psychic
         @sample_finder.find_sample(code_sample)
       end
 
-      def run_sample(code_sample, *args)
-        sample_file = find_sample(code_sample)
-        absolute_sample_file = File.expand_path(sample_file, cwd)
+      def run_sample(code_sample_name, *args)
+        code_sample = find_sample(code_sample_name)
+        sample_file = code_sample.source_file
+        absolute_sample_file = code_sample.absolute_source_file
         process_parameters(absolute_sample_file)
-        command = build_command(code_sample, sample_file)
+        command = build_command(code_sample_name, sample_file)
         if command
           execute(command, *args)
         else
@@ -80,6 +81,7 @@ module Psychic
       end
 
       def prompt(key)
+        value = @parameters[key]
         if value
           return value unless @interactive_mode == 'always'
           new_value = @cli.ask "Please set a value for #{key} (or enter to confirm #{value.inspect}): "

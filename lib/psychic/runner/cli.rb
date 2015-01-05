@@ -30,6 +30,7 @@ module Psychic
 
       desc 'sample <name>', 'Executes a code sample'
       method_option :list, aliases: '-l', desc: 'List known tasks'
+      method_option :show, aliases: '-s', desc: 'Display details about a sample'
       method_option :verbose, aliases: '-v', desc: 'Verbose: display more details'
       method_option :cwd, desc: 'Working directory for detecting and running commands'
       method_option :interactive, desc: 'Prompt for parameters?', enum: %w(always missing), lazy_default: 'missing'
@@ -39,6 +40,7 @@ module Psychic
       def sample(sample_name = nil)
         return list_samples if options[:list]
         abort 'You must specify a sample name, run with -l for a list of known samples' unless sample_name
+        show_sample(sample_name) if options[:show]
         result = runner.run_sample(sample_name, *extra_args)
         if options.dry_run
           say_status :dry_run, sample_name
@@ -64,9 +66,14 @@ module Psychic
 
         def list_samples
           samples = runner.known_samples.map do |sample|
-            [set_color(sample.name, :bold), sample.file]
+            [set_color(sample.name, :bold), sample.source_file]
           end
           print_table samples
+        end
+
+        def show_sample(sample_name)
+          sample = runner.find_sample(sample_name)
+          say sample.to_s(options[:verbose])
         end
       end
 
