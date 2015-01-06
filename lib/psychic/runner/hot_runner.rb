@@ -8,8 +8,9 @@ module Psychic
         @known_tasks = @tasks.keys
       end
 
-      def [](task_name)
-        @tasks[task_name]
+      def task_for(task_name)
+        return @tasks[task_name] if @tasks.include? task_name
+        super
       end
     end
   end

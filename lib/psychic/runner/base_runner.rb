@@ -63,14 +63,12 @@ module Psychic
         super
       end
 
-      def [](task)
-        return known_tasks[task] if known_tasks.include? task
-        return public_send(task) if respond_to? task
-        fail Psychic::Runner::TaskNotImplementedError, "#{self.class} cannot handle task #{task}"
+      def task_for(task_name)
+        public_send(task_name) if respond_to?(task_name.to_sym)
       end
 
-      def method_missing(task, *args, &block)
-        build_task(task, *args)
+      def method_missing(task_name, *args, &block)
+        build_task(task_name, *args)
       rescue Psychic::Runner::TaskNotImplementedError
         super
       end
@@ -83,9 +81,11 @@ module Psychic
         shell.execute(full_cmd, @shell_opts) unless dry_run?
       end
 
-      def build_task(task, *args)
-        task_name = task.to_s
-        self[task_name]
+      def build_task(task_name, *_args)
+        task_name = task_name.to_s
+        task = task_for(task_name)
+        fail Psychic::Runner::TaskNotImplementedError, task_name if task.nil?
+        task
       end
 
       def execute_task(task, *args)

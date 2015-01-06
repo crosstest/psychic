@@ -14,7 +14,7 @@ module Psychic
           end
         end
 
-        def [](task_name)
+        def task_for(task_name)
           task = task_name.to_s
           script = Dir["#{@cwd}/scripts/#{task}{.sh,}"].first
           if script

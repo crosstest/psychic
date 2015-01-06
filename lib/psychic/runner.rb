@@ -16,7 +16,11 @@ module Psychic
     autoload :HotRunner, 'psychic/runner/hot_runner'
     autoload :CompoundRunner, 'psychic/runner/compound_runner'
     autoload :ColdRunnerRegistry, 'psychic/runner/cold_runner_registry'
-    class TaskNotImplementedError < NotImplementedError; end
+    class TaskNotImplementedError < NotImplementedError
+      def initialize(task_name)
+        super("#{self.class} cannot handle task #{task_name}")
+      end
+    end
     ColdRunnerRegistry.autoload_runners!
 
     include BaseRunner
@@ -38,7 +42,7 @@ module Psychic
       @sample_finder.known_samples
     end
 
-    def [](task_name)
+    def task_for(task_name)
       runner = runners.find { |r| r.respond_to?(task_name) }
       return nil unless runner
       runner[task_name]
