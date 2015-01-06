@@ -66,7 +66,7 @@ module Psychic
       def [](task)
         return known_tasks[task] if known_tasks.include? task
         return public_send(task) if respond_to? task
-        fail Psychic::Runner::TaskNotImplementedError
+        fail Psychic::Runner::TaskNotImplementedError, "#{self.class} cannot handle task #{task}"
       end
 
       def method_missing(task, *args, &block)
@@ -83,15 +83,9 @@ module Psychic
         shell.execute(full_cmd, @shell_opts) unless dry_run?
       end
 
-      def command_for_task(task, *_args)
+      def build_task(task, *args)
         task_name = task.to_s
         self[task_name]
-      end
-
-      def build_task(task, *args)
-        command = command_for_task(task, *args)
-        fail Psychic::Runner::TaskNotImplementedError if command.nil?
-        command
       end
 
       def execute_task(task, *args)

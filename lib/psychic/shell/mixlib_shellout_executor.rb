@@ -37,7 +37,9 @@ module Psychic
         @logger = opts.delete(:logger) || logger
         @shell = Mixlib::ShellOut.new(command, opts)
         @shell.live_stream = IOToLog.new(@logger)
-        @shell.run_command
+        Bundler.with_clean_env do
+          @shell.run_command
+        end
         execution_result
       rescue SystemCallError, *MIXLIB_SHELLOUT_EXCEPTION_CLASSES, TypeError => e
         # See https://github.com/opscode/mixlib-shellout/issues/62
