@@ -23,6 +23,8 @@ module Psychic
 
       BUILT_IN_TASKS.each do |task_name|
         desc task_name, "Executes the #{task_name} task"
+        method_option :verbose, aliases: '-v', desc: 'Verbose: display more details'
+        method_option :cwd, desc: 'Working directory for detecting and running commands'
         define_method(task_name) do
           task(task_name)
         end

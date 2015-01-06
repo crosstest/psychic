@@ -63,6 +63,12 @@ module Psychic
         super
       end
 
+      def [](task)
+        return known_tasks[task] if known_tasks.include? task
+        return public_send(task) if respond_to? task
+        fail Psychic::Runner::TaskNotImplementedError
+      end
+
       def method_missing(task, *args, &block)
         build_task(task, *args)
       rescue Psychic::Runner::TaskNotImplementedError
