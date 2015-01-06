@@ -46,13 +46,13 @@ module Psychic
           end
         end
 
-        describe '#method_missing' do
+        describe '#execute_task' do
           context 'matching a task' do
             context 'with scripts/*.sh files' do
               include_context 'with scripts/*.sh files' do
                 it 'executes the script command' do
                   expect(shell).to receive(:execute).with('./scripts/bootstrap.sh', cwd: current_dir)
-                  subject.bootstrap
+                  subject.execute_task :bootstrap
                 end
               end
             end
@@ -61,7 +61,7 @@ module Psychic
               include_context 'with scripts/* (no extension) files' do
                 it 'executes the script command' do
                   expect(shell).to receive(:execute).with('./scripts/bootstrap', cwd: current_dir)
-                  subject.bootstrap
+                  subject.execute_task :bootstrap
                 end
               end
             end

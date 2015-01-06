@@ -26,9 +26,8 @@ module Psychic
 
         describe '#method_missing' do
           context 'matching a task' do
-            it 'executes the task command' do
-              expect(shell).to receive(:execute).with('foo', cwd: current_dir)
-              subject.bootstrap
+            it 'builds the task command' do
+              expect(subject.bootstrap).to eq('foo')
             end
           end
 
