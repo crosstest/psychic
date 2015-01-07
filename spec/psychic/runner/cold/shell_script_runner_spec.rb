@@ -21,15 +21,15 @@ module Psychic
           end
         end
 
-        describe 'respond_to?' do
+        describe 'known_task?' do
           shared_examples 'detects matching scripts' do
             it 'returns true if a matching script exists' do
-              expect(subject.respond_to? :bootstrap).to be true
-              expect(subject.respond_to? :compile).to be true
+              expect(subject.known_task? :bootstrap).to be true
+              expect(subject.known_task? :compile).to be true
             end
             it 'returns false if a matching script does not exists' do
-              expect(subject.respond_to? :foo).to be false
-              expect(subject.respond_to? :bar).to be false
+              expect(subject.known_task? :foo).to be false
+              expect(subject.known_task? :bar).to be false
             end
           end
 

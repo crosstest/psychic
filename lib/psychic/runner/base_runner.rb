@@ -6,10 +6,7 @@ module Psychic
       include Psychic::Shell
       include Psychic::Logger
 
-      attr_reader :known_tasks
-      attr_reader :cwd
-      attr_reader :env
-      attr_reader :hints
+      attr_reader :known_tasks, :tasks, :cwd, :env, :hints
 
       module ClassMethods
         def register_runner
@@ -36,8 +33,13 @@ module Psychic
           @known_tasks ||= []
         end
 
+        def tasks
+          @tasks ||= {}
+        end
+
         def task(name, &block)
-          define_method name, &block
+          name = name.to_s
+          tasks[name] = block
           known_tasks << name
         end
       end
@@ -51,6 +53,7 @@ module Psychic
         init_attr(:cwd) { Dir.pwd }
         init_hints
         init_attr(:known_tasks) { self.class.known_tasks }
+        init_attr(:tasks) { self.class.tasks }
         init_attr(:logger) { new_logger }
         init_attr(:env) { ENV.to_hash }
         init_attrs :cli, :interactive, :parameter_mode, :restore_mode, :dry_run
@@ -58,22 +61,13 @@ module Psychic
         @parameters = load_parameters(opts[:parameters])
       end
 
-      def respond_to_missing?(task, include_all = false)
-        return true if known_tasks.include?(task.to_s)
-        super
+      def known_task?(task_name)
+        known_tasks.include?(task_name.to_s)
       end
 
       def task_for(task_name)
-        public_send(task_name) if respond_to?(task_name.to_sym)
+        tasks[task_name] if tasks.include? task_name
       end
-
-      def method_missing(task_name, *args, &block)
-        build_task(task_name, *args)
-      rescue Psychic::Runner::TaskNotImplementedError
-        super
-      end
-
-      # Reserved words
 
       def execute(command, *args)
         full_cmd = [command, *args].join(' ')
@@ -84,12 +78,13 @@ module Psychic
       def build_task(task_name, *_args)
         task_name = task_name.to_s
         task = task_for(task_name)
+        task = task.call if task.respond_to? :call
         fail Psychic::Runner::TaskNotImplementedError, task_name if task.nil?
         task
       end
 
-      def execute_task(task, *args)
-        command = build_task(task, *args)
+      def execute_task(task_name, *args)
+        command = build_task(task_name, *args)
         execute(command, *args)
       end
 

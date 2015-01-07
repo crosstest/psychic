@@ -45,18 +45,18 @@ eos
         end
 
         shared_examples 'uses bundler' do
-          describe 'respond_to?' do
-            it 'responds to bootstrap' do
-              expect(subject.respond_to? :bootstrap).to be true
+          describe 'known_task?' do
+            it 'is true for bootstrap' do
+              expect(subject.known_task? :bootstrap).to be true
             end
-            it 'does not respond to compile' do
-              expect(subject.respond_to? :compile).to be false
+            it 'is false for compile' do
+              expect(subject.known_task? :compile).to be false
             end
           end
 
           describe '#bootstrap' do
             it 'returns bundle install' do
-              expect(subject.bootstrap).to eq('bundle install')
+              expect(subject.build_task(:bootstrap)).to eq('bundle install')
             end
           end
         end

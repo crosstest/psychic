@@ -9,7 +9,7 @@ module Psychic
       end
 
       def task_for(task_name)
-        return @tasks[task_name] if @tasks.include? task_name
+        return @tasks[task_name.to_s] if @tasks.include? task_name.to_s
         super
       end
     end

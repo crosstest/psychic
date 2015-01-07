@@ -43,9 +43,9 @@ module Psychic
     end
 
     def task_for(task_name)
-      runner = runners.find { |r| r.respond_to?(task_name) }
+      runner = runners.find { |r| r.known_task?(task_name) }
       return nil unless runner
-      runner[task_name]
+      runner.task_for(task_name)
     end
   end
 end

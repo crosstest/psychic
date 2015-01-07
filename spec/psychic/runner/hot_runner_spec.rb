@@ -12,22 +12,22 @@ module Psychic
       subject { described_class.new(cwd: current_dir, hints: task_map) }
 
       shared_examples 'runs tasks' do
-        describe 'respond_to?' do
+        describe 'known_task?' do
           it 'returns true for task ids' do
             task_map.each_key do |key|
-              expect(subject.respond_to? key).to be true
+              expect(subject.known_task? key).to be true
             end
           end
 
           it 'returns false for anything else' do
-            expect(subject.respond_to? 'max').to be false
+            expect(subject.known_task? 'max').to be false
           end
         end
 
-        describe '#method_missing' do
+        describe '#task_for' do
           context 'matching a task' do
             it 'builds the task command' do
-              expect(subject.bootstrap).to eq('foo')
+              expect(subject.task_for(:bootstrap)).to eq('foo')
             end
           end
 

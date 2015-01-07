@@ -53,7 +53,7 @@ module Psychic
       end
 
       def build_command(code_sample, sample_file)
-        command = self['run_sample']
+        command = task_for(:run_sample)
         return nil if command.nil?
 
         command_params = { sample: code_sample, sample_file: sample_file }
