@@ -59,7 +59,7 @@ module Psychic
 
     def status(status, msg = nil, color = :cyan, colwidth = 50)
       msg = yield if block_given?
-      cli.say(indent)
+      cli.say(indent) if indent.length > 0
       status = cli.set_color("#{status}:", color, true)
       # The built-in say_status is right-aligned, we want left-aligned
       cli.say format("%-#{colwidth}s %s", status, msg).rstrip

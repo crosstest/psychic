@@ -1,6 +1,6 @@
 module Psychic
   class Runner
-    class HotRunner
+    class HotReadTaskFactory
       include BaseRunner
       def initialize(opts = {})
         super

@@ -5,7 +5,21 @@ require 'psychic/runner'
 
 module Psychic
   class Runner
-    class CLI < Psychic::CLI
+    class RunnerCLI < Psychic::CLI
+      no_commands do
+        def runner
+          @runner ||= setup_runner
+        end
+
+        def setup_runner
+          runner_opts = { cwd: Dir.pwd, cli: shell, parameters: options.parameters }
+          runner_opts.merge!(Util.symbolized_hash(options))
+          Psychic::Runner.new(runner_opts)
+        end
+      end
+    end
+
+    class CLI < RunnerCLI
       desc 'task <name>', 'Executes any task by name'
       method_option :list, aliases: '-l', desc: 'List known tasks'
       method_option :verbose, aliases: '-v', desc: 'Verbose: display more details'
@@ -31,8 +45,6 @@ module Psychic
       end
 
       desc 'sample <name>', 'Executes a code sample'
-      method_option :list, aliases: '-l', desc: 'List known tasks'
-      method_option :show, aliases: '-s', desc: 'Display details about a sample'
       method_option :verbose, aliases: '-v', desc: 'Verbose: display more details'
       method_option :cwd, desc: 'Working directory for detecting and running commands'
       method_option :interactive, desc: 'Prompt for parameters?', enum: %w(always missing), lazy_default: 'missing'
@@ -40,9 +52,7 @@ module Psychic
       method_option :parameter_mode, desc: 'How should the parameters be passed?', enum: %w(tokens arguments env)
       method_option :dry_run, desc: 'Do not execute - just show what command would be run', lazy_default: true
       def sample(sample_name = nil)
-        return list_samples if options[:list]
-        abort 'You must specify a sample name, run with -l for a list of known samples' unless sample_name
-        show_sample(sample_name) if options[:show]
+        abort 'You must specify a sample name, run `psychic list samples` for a list of known samples' unless sample_name
         result = runner.run_sample(sample_name, *extra_args)
         if options.dry_run
           say_status :dry_run, sample_name
@@ -52,12 +62,26 @@ module Psychic
         end
       end
 
-      no_commands do
-        def list_tasks
+      class List < RunnerCLI
+        desc 'samples', 'Lists known code samples'
+        method_option :verbose, aliases: '-v', desc: 'Verbose: display more details'
+        method_option :cwd, desc: 'Working directory for detecting and running commands'
+        def samples
+          samples = runner.known_samples.map do |sample|
+            [set_color(sample.name, :bold), sample.source_file]
+          end
+          print_table samples
+        end
+
+        desc 'tasks', 'List known tasks'
+        method_option :verbose, aliases: '-v', desc: 'Verbose: display more details'
+        method_option :cwd, desc: 'Working directory for detecting and running commands'
+        def tasks
           runner.known_tasks.map do |task|
             task_id = set_color(task, :bold)
             if options[:verbose]
-              details = runner[task]
+              details = runner.task_for(task)
+              details = details.call if details.respond_to? :call
               details = "\n#{details}".lines.join('  ') if details.lines.size > 1
               say "#{task_id}: #{details}"
             else
@@ -65,30 +89,26 @@ module Psychic
             end
           end
         end
+      end
 
-        def list_samples
-          samples = runner.known_samples.map do |sample|
-            [set_color(sample.name, :bold), sample.source_file]
-          end
-          print_table samples
-        end
-
-        def show_sample(sample_name)
+      class Show < RunnerCLI
+        desc 'sample <name>', 'Show detailed information about a code sample'
+        method_option :verbose, aliases: '-v', desc: 'Verbose: display more details'
+        method_option :cwd, desc: 'Working directory for detecting and running commands'
+        def sample(sample_name)
           sample = runner.find_sample(sample_name)
           say sample.to_s(options[:verbose])
         end
       end
 
-      private
+      desc 'list', 'List known tasks or code samples'
+      subcommand 'list', List
+      desc 'show', 'Show details about a task or code sample'
+      subcommand 'show', Show
 
-      def runner
-        @runner ||= setup_runner
-      end
-
-      def setup_runner
-        runner_opts = { cwd: Dir.pwd, cli: shell, parameters: options.parameters }
-        runner_opts.merge!(Util.symbolized_hash(options))
-        Psychic::Runner.new(runner_opts)
+      no_commands do
+        def show_sample(_sample_name)
+        end
       end
     end
   end

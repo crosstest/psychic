@@ -14,16 +14,23 @@ module Psychic
         @token_handler ||= RegexpTokenHandler.new(source, /'\{(\w+)\}'/, "'\\1'")
       end
 
+      def command(runner)
+        command = runner.task_for(:run_sample)
+        # FIXME: Shouldn't this be relative to runner's cwd?
+        # command ||= Psychic::Util.relativize(source_file, runner.cwd)
+        command ||= "./#{source_file}"
+
+        command_params = { sample: name, sample_file: source_file }
+        command_params.merge!(@parameters) unless @parameters.nil?
+        Psychic::Util.replace_tokens(command, command_params)
+      end
+
       def to_s(verbose = false)
-        if verbose
-          build_string do
-            status('Sample Name', name)
-            display_tokens
-            status('Source File', formatted_file_name)
-            display_source
-          end
-        else
-          to_h.to_s
+        build_string do
+          status('Sample Name', name)
+          display_tokens
+          status('Source File', formatted_file_name)
+          display_source if verbose
         end
       end
 
@@ -41,6 +48,8 @@ module Psychic
       end
 
       def display_tokens
+        return status 'Tokens', '(None)' if token_handler.tokens.empty?
+
         status 'Tokens'
         indent do
           token_handler.tokens.each do | token |

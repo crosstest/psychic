@@ -1,7 +1,7 @@
 module Psychic
   class Runner
-    module Cold
-      RSpec.describe BundlerDetector do
+    module Factories
+      RSpec.describe BundlerTaskFactory do
         let(:shell) { Psychic::Shell.shell = double('shell') }
         subject { described_class.new(cwd: current_dir) }
 

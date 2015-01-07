@@ -1,11 +1,11 @@
 module Psychic
   class Runner
-    module Cold
-      class ShellScriptRunner
+    module Factories
+      class ShellScriptTaskFactory < MagicTaskFactory
         include BaseRunner
         EXTENSIONS = ['.sh', '']
         magic_file 'scripts/*'
-        register_runner
+        register_task_factory
 
         def initialize(opts)
           super

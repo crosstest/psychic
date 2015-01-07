@@ -1,12 +1,11 @@
 module Psychic
   class Runner
-    module Cold
-      class BundlerDetector
-        include BaseRunner
+    module Factories
+      class BundlerTaskFactory < MagicTaskFactory
         magic_file 'Gemfile'
         magic_file '.bundle/config'
         magic_env_var 'BUNDLE_GEMFILE'
-        register_runner
+        register_task_factory
 
         task :bootstrap do
           'bundle install'

@@ -1,7 +1,7 @@
 module Psychic
   class Runner
-    module Cold
-      RSpec.describe ShellScriptRunner do
+    module Factories
+      RSpec.describe ShellScriptTaskFactory do
         let(:shell) { Psychic::Shell.shell = double('shell') }
         subject { described_class.new(cwd: current_dir) }
 

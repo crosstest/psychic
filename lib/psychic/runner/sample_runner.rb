@@ -7,19 +7,9 @@ module Psychic
 
       def run_sample(code_sample_name, *args)
         code_sample = find_sample(code_sample_name)
-        sample_file = code_sample.source_file
         absolute_sample_file = code_sample.absolute_source_file
         process_parameters(absolute_sample_file)
-        command = build_command(code_sample_name, sample_file)
-        if command
-          execute(command, *args)
-        else
-          run_sample_file(sample_file, *args)
-        end
-      end
-
-      def run_sample_file(sample_file, *args)
-        execute("./#{sample_file}", *args) # Assuming Bash, but should detect Windows and use PowerShell
+        execute(code_sample.command(self), *args)
       end
 
       def process_parameters(sample_file)

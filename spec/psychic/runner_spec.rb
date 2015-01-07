@@ -20,8 +20,10 @@ module Psychic
       end
 
       describe 'initialize' do
-        it 'should create a HotRunner for the specified directory' do
-          expect(subject.hot_runner).to be_an_instance_of(Psychic::Runner::HotRunner)
+        it 'should create a HotReadTaskFactory for the specified directory' do
+          expect(subject.hot_read_task_factory).to(
+            be_an_instance_of Psychic::Runner::HotReadTaskFactory
+          )
           expect(subject.cwd).to eq(current_dir)
         end
       end
@@ -34,9 +36,9 @@ module Psychic
       end
 
       describe 'initialize' do
-        it 'should create a cold runner for ShellScriptRunner' do
-          expect(subject.cold_runners).to include(
-            an_instance_of(Psychic::Runner::Cold::ShellScriptRunner)
+        it 'should create a ShellScriptTaskFactory' do
+          expect(subject.task_factories).to include(
+            an_instance_of(Psychic::Runner::Factories::ShellScriptTaskFactory)
           )
         end
       end

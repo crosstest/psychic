@@ -1,6 +1,6 @@
 module Psychic
   class Runner
-    RSpec.describe HotRunner do
+    RSpec.describe HotReadTaskFactory do
       let(:task_map) do
         {
           'bootstrap' => 'foo',
