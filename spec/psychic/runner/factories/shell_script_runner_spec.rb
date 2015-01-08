@@ -46,13 +46,12 @@ module Psychic
           end
         end
 
-        describe '#execute_task' do
+        describe '#task_for' do
           context 'matching a task' do
             context 'with scripts/*.sh files' do
               include_context 'with scripts/*.sh files' do
-                it 'executes the script command' do
-                  expect(shell).to receive(:execute).with('./scripts/bootstrap.sh', cwd: current_dir)
-                  subject.execute_task :bootstrap
+                it 'returns the script command' do
+                  expect(subject.task_for :bootstrap).to eq('./scripts/bootstrap.sh')
                 end
               end
             end
@@ -60,8 +59,7 @@ module Psychic
             context 'with scripts/* (no extension) files' do
               include_context 'with scripts/* (no extension) files' do
                 it 'executes the script command' do
-                  expect(shell).to receive(:execute).with('./scripts/bootstrap', cwd: current_dir)
-                  subject.execute_task :bootstrap
+                  expect(subject.task_for :bootstrap).to eq('./scripts/bootstrap')
                 end
               end
             end
@@ -70,7 +68,7 @@ module Psychic
           context 'not matching a task' do
             it 'raises an error' do
               # Use foo to ensure it doesn't match ps1 or hidden (. prefixed) files
-              expect { subject.foo }.to raise_error(NoMethodError)
+              expect(subject.task_for :foo).to be nil
             end
           end
         end

@@ -2,7 +2,6 @@ module Psychic
   class Runner
     module Factories
       class ShellScriptTaskFactory < MagicTaskFactory
-        include BaseRunner
         EXTENSIONS = ['.sh', '']
         magic_file 'scripts/*'
         register_task_factory

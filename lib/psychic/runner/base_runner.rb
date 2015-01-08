@@ -77,15 +77,15 @@ module Psychic
 
       def build_task(task_name, *_args)
         task_name = task_name.to_s
-        task = task_for(task_name)
-        task = task.call if task.respond_to? :call
-        fail Psychic::Runner::TaskNotImplementedError, task_name if task.nil?
-        task
+        command = task_for(task_name)
+        command = command.call if command.respond_to? :call
+        fail Psychic::Runner::TaskNotImplementedError, task_name if command.nil?
+        Task.new(task_name, command)
       end
 
       def execute_task(task_name, *args)
-        command = build_task(task_name, *args)
-        execute(command, *args)
+        task = build_task(task_name, *args)
+        execute(task.command, *args)
       end
 
       def active?

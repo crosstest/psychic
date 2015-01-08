@@ -11,6 +11,7 @@ module Psychic
   class Runner
     autoload :MagicTaskFactory, 'psychic/runner/magic_task_factory'
     autoload :BaseRunner, 'psychic/runner/base_runner'
+    autoload :Task, 'psychic/runner/task'
     autoload :CodeSample, 'psychic/runner/code_sample'
     autoload :SampleFinder, 'psychic/runner/sample_finder'
     autoload :SampleRunner, 'psychic/runner/sample_runner'
