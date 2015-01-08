@@ -88,16 +88,6 @@ module Psychic
         execute(task.command, *args)
       end
 
-      def active?
-        self.class.magic_file_patterns.each do | pattern |
-          return true unless Dir["#{@cwd}/#{pattern}"].empty?
-        end
-        self.class.magic_env_vars.each do | var |
-          return true if ENV[var]
-        end
-        false
-      end
-
       def dry_run?
         @dry_run == true
       end
