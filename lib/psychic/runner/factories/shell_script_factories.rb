@@ -2,6 +2,7 @@ module Psychic
   class Runner
     module Factories
       class ShellScriptTaskFactory < MagicTaskFactory
+        TASK_PRIORITY = 1
         EXTENSIONS = ['.sh', '']
         magic_file 'scripts/*'
         register_task_factory

@@ -3,7 +3,9 @@ module Psychic
     class MagicTaskFactory
       include Psychic::Logger
 
-      attr_reader :known_tasks, :tasks, :cwd, :env, :hints
+      TASK_PRIORITY = 5
+
+      attr_reader :known_tasks, :tasks, :cwd, :env, :hints, :priority
 
       class << self
         def register_task_factory
@@ -43,6 +45,7 @@ module Psychic
 
       def initialize(opts = {})
         @opts = opts
+        @priority = self.class::TASK_PRIORITY
         init_attr(:cwd) { Dir.pwd }
         init_attr(:known_tasks) { self.class.known_tasks }
         init_attr(:tasks) { self.class.tasks }

@@ -23,7 +23,7 @@ module Psychic
 
         def active_task_factories(opts)
           task_factories = task_factory_classes.map { |k| k.new(opts) }
-          task_factories.select(&:active?)
+          task_factories.select(&:active?).sort_by(&:priority)
         end
       end
     end

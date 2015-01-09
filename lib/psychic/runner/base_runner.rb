@@ -2,11 +2,12 @@ module Psychic
   class Runner
     module BaseRunner
       DEFAULT_PARAMS_FILE = 'psychic-parameters.yaml'
+      TASK_PRIORITY = 5
 
       include Psychic::Shell
       include Psychic::Logger
 
-      attr_reader :known_tasks, :tasks, :cwd, :env, :hints
+      attr_reader :known_tasks, :tasks, :cwd, :env, :hints, :priority
 
       module ClassMethods
         def register_task_factory
@@ -50,6 +51,7 @@ module Psychic
 
       def initialize(opts = {})
         @opts = opts
+        @priority = TASK_PRIORITY
         init_attr(:cwd) { Dir.pwd }
         init_hints
         init_attr(:known_tasks) { self.class.known_tasks }
@@ -80,7 +82,7 @@ module Psychic
         command = task_for(task_name)
         command = command.call if command.respond_to? :call
         fail Psychic::Runner::TaskNotImplementedError, task_name if command.nil?
-        Task.new(task_name, command)
+        Task.new(task_name, command, TASK_PRIORITY)
       end
 
       def execute_task(task_name, *args)
