@@ -19,7 +19,7 @@ module Psychic
     autoload :TaskFactoryRegistry, 'psychic/runner/task_factory_registry'
     class TaskNotImplementedError < NotImplementedError
       def initialize(task_name)
-        super("#{self.class} cannot handle task #{task_name}")
+        super("task #{task_name} is not implemented")
       end
     end
     TaskFactoryRegistry.autoload_task_factories!
