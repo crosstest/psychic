@@ -17,7 +17,7 @@ end
 
 # Configs recommended by RSpec
 RSpec.configure do |config|
-  config.warnings = true
+  # config.warnings = true # Unfortunately this produces too many warnings in third-party code
   config.disable_monkey_patching!
   config.filter_run :focus
   config.run_all_when_everything_filtered = true
