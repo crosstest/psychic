@@ -24,15 +24,31 @@ module Psychic
       method_option :list, aliases: '-l', desc: 'List known tasks'
       method_option :verbose, aliases: '-v', desc: 'Verbose: display more details'
       method_option :cwd, desc: 'Working directory for detecting and running commands'
+      method_option :print, aliases: '-p', desc: 'Print the command (or script) instead of running it'
       def task(task_name = nil)
         return list_tasks if options[:list]
         abort 'You must specify a task name, run with -l for a list of known tasks' unless task_name
-        result = runner.execute_task(task_name, *extra_args)
-        result.error!
-        say_status :success, task_name
+        if options[:print]
+          print_task task_name, *extra_args
+        else
+          execute_task task_name, *extra_args
+        end
       rescue Psychic::Shell::ExecutionError => e
         say_status :failed, task_name, :red
         say e.execution_result if e.execution_result
+      end
+
+      no_commands do
+        def print_task(task_name, *args)
+          task = runner.build_task(task_name)
+          say "#{task.command} #{args.join ' '}\n"
+        end
+
+        def execute_task(task_name, *args)
+          result = runner.execute_task(task_name, *args)
+          result.error!
+          say_status :success, task_name
+        end
       end
 
       BUILT_IN_TASKS.each do |task_name|
