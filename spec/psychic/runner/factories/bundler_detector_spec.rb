@@ -56,7 +56,7 @@ eos
 
           describe '#bootstrap' do
             it 'returns bundle install' do
-              expect(subject.build_task(:bootstrap)).to eq('bundle install')
+              expect(subject.find_task(:bootstrap)).to eq('bundle install')
             end
           end
         end

@@ -40,13 +40,13 @@ module Psychic
 
           describe '#bootstrap' do
             it 'returns travis run install' do
-              expect(subject.build_task(:bootstrap)).to eq('travis run --skip-version-check install')
+              expect(subject.find_task(:bootstrap)).to eq('travis run --skip-version-check install')
             end
           end
 
           describe '#test' do
             it 'returns travis run script' do
-              expect(subject.build_task(:test)).to eq('travis run --skip-version-check script')
+              expect(subject.find_task(:test)).to eq('travis run --skip-version-check script')
             end
           end
         end

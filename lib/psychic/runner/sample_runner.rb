@@ -1,7 +1,7 @@
 module Psychic
   class Runner
     module SampleRunner
-      def find_sample(code_sample)
+      def find_sample(code_sample, *_args)
         @sample_finder.find_sample(code_sample)
       end
 
@@ -40,15 +40,6 @@ module Psychic
           return v if k.downcase == code_sample.downcase
         end
         nil
-      end
-
-      def build_command(code_sample, sample_file)
-        command = task_for(:run_sample)
-        return nil if command.nil?
-
-        command_params = { sample: code_sample, sample_file: sample_file }
-        command_params.merge!(@parameters) unless @parameters.nil?
-        Psychic::Util.replace_tokens(command, command_params)
       end
 
       def backup_and_overwrite(file)

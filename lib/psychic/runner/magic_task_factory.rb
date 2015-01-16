@@ -57,7 +57,7 @@ module Psychic
         tasks[task_name] if tasks.include? task_name
       end
 
-      def build_task(task_name, *_args)
+      def find_task(task_name, *_args)
         task_name = task_name.to_s
         task = task_for(task_name)
         task = task.call if task.respond_to? :call

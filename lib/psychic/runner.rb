@@ -38,7 +38,7 @@ module Psychic
       init_hints
       init_attr(:logger) { new_logger }
       init_attr(:env) { ENV.to_hash }
-      init_attrs :cli, :interactive, :parameter_mode, :restore_mode, :dry_run
+      init_attrs :cli, :interactive, :parameter_mode, :restore_mode, :print
       @shell_opts = select_shell_opts
       @parameters = load_parameters(opts[:parameters])
       # super

@@ -58,7 +58,7 @@ module Psychic
         init_attr(:tasks) { self.class.tasks }
         init_attr(:logger) { new_logger }
         init_attr(:env) { ENV.to_hash }
-        init_attrs :cli, :interactive, :parameter_mode, :restore_mode, :dry_run
+        init_attrs :cli, :interactive, :parameter_mode, :restore_mode, :print
         @shell_opts = select_shell_opts
         @parameters = load_parameters(opts[:parameters])
       end
@@ -73,11 +73,11 @@ module Psychic
 
       def execute(command, *args)
         full_cmd = [command, *args].join(' ')
-        logger.info("Executing #{full_cmd}")
-        shell.execute(full_cmd, @shell_opts) unless dry_run?
+        logger.info("Executing: #{full_cmd}")
+        shell.execute(full_cmd, @shell_opts) unless print?
       end
 
-      def build_task(task_name, *_args)
+      def find_task(task_name, *_args)
         task_name = task_name.to_s
         command = task_for(task_name)
         command = command.call if command.respond_to? :call
@@ -86,12 +86,12 @@ module Psychic
       end
 
       def execute_task(task_name, *args)
-        task = build_task(task_name, *args)
+        task = find_task(task_name, *args)
         execute(task.command, *args)
       end
 
-      def dry_run?
-        @dry_run == true
+      def print?
+        @print == true
       end
 
       private

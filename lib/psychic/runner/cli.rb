@@ -40,7 +40,7 @@ module Psychic
 
       no_commands do
         def print_task(task_name, *args)
-          task = runner.build_task(task_name)
+          task = runner.find_task(task_name)
           say "#{task.command} #{args.join ' '}\n"
         end
 
@@ -48,6 +48,17 @@ module Psychic
           result = runner.execute_task(task_name, *args)
           result.error!
           say_status :success, task_name
+        end
+
+        def print_sample(sample_name, *args)
+          sample = runner.find_sample(sample_name)
+          say "#{sample.command(runner)} #{args.join ' '}\n"
+        end
+
+        def execute_sample(sample_name, *args)
+          result = runner.run_sample(sample_name, *args)
+          result.error!
+          say_status :success, sample_name
         end
       end
 
@@ -66,15 +77,13 @@ module Psychic
       method_option :interactive, desc: 'Prompt for parameters?', enum: %w(always missing), lazy_default: 'missing'
       method_option :parameters, desc: 'YAML file containing key/value parameters. Default: psychic-parameters.yaml'
       method_option :parameter_mode, desc: 'How should the parameters be passed?', enum: %w(tokens arguments env)
-      method_option :dry_run, desc: 'Do not execute - just show what command would be run', lazy_default: true
+      method_option :print, aliases: '-p', desc: 'Print the command (or script) instead of running it', lazy_default: true
       def sample(sample_name = nil)
         abort 'You must specify a sample name, run `psychic list samples` for a list of known samples' unless sample_name
-        result = runner.run_sample(sample_name, *extra_args)
-        if options.dry_run
-          say_status :dry_run, sample_name
+        if options[:print]
+          print_sample sample_name, *extra_args
         else
-          result.error!
-          say_status :success, sample_name
+          execute_sample sample_name, *extra_args
         end
       end
 
