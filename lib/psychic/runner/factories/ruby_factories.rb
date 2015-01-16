@@ -11,6 +11,10 @@ module Psychic
         task :bootstrap do
           'bundle install'
         end
+
+        task :run_sample do
+          'bundle exec ruby {{sample_file}}'
+        end
       end
     end
   end

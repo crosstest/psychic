@@ -19,6 +19,7 @@ module Psychic
         # FIXME: Shouldn't this be relative to runner's cwd?
         # command ||= Psychic::Util.relativize(source_file, runner.cwd)
         command ||= "./#{source_file}"
+        command = command.call if command.respond_to? :call
 
         command_params = { sample: name, sample_file: source_file }
         command_params.merge!(@parameters) unless @parameters.nil?
