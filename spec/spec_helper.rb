@@ -2,7 +2,7 @@ require 'simplecov'
 SimpleCov.start
 
 require 'rspec'
-require 'psychic/runner'
+require 'crosstest/psychic'
 require 'aruba'
 require 'aruba/api'
 
