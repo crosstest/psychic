@@ -28,7 +28,7 @@ module Crosstest
 
           template = File.read(sample_file)
           # Default token pattern/replacement (used by php-opencloud) should be configurable
-          token_handler = RegexpTokenHandler.new(template, /'\{(\w+)\}'/, "'\\1'")
+          token_handler = Tokens::RegexpTokenHandler.new(template, /'\{(\w+)\}'/, "'\\1'")
           confirm_or_update_parameters(token_handler.tokens)
           File.write(sample_file, token_handler.render(@parameters))
         end
