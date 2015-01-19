@@ -1,4 +1,5 @@
 require 'psychic/runner/version'
+require 'crosstest/core'
 
 autoload :Thor, 'thor'
 autoload :YAML, 'yaml'

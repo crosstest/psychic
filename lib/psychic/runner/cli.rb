@@ -1,11 +1,11 @@
-require 'psychic/cli'
+require 'crosstest/core'
 require 'psychic/runner'
 
 # rubocop:disable Metrics/LineLength
 
 module Psychic
   class Runner
-    class RunnerCLI < Psychic::CLI
+    class RunnerCLI < Crosstest::Core::CLI
       no_commands do
         def runner
           @runner ||= setup_runner
