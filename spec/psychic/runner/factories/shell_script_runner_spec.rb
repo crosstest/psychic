@@ -46,12 +46,12 @@ module Psychic
           end
         end
 
-        describe '#task_for' do
+        describe '#command_for_task' do
           context 'matching a task' do
             context 'with scripts/*.sh files' do
               include_context 'with scripts/*.sh files' do
                 it 'returns the script command' do
-                  expect(subject.task_for :bootstrap).to eq('./scripts/bootstrap.sh')
+                  expect(subject.command_for_task :bootstrap).to eq('./scripts/bootstrap.sh')
                 end
               end
             end
@@ -59,7 +59,7 @@ module Psychic
             context 'with scripts/* (no extension) files' do
               include_context 'with scripts/* (no extension) files' do
                 it 'executes the script command' do
-                  expect(subject.task_for :bootstrap).to eq('./scripts/bootstrap')
+                  expect(subject.command_for_task :bootstrap).to eq('./scripts/bootstrap')
                 end
               end
             end
@@ -68,7 +68,7 @@ module Psychic
           context 'not matching a task' do
             it 'raises an error' do
               # Use foo to ensure it doesn't match ps1 or hidden (. prefixed) files
-              expect(subject.task_for :foo).to be nil
+              expect(subject.command_for_task :foo).to be nil
             end
           end
         end

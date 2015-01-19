@@ -28,8 +28,9 @@ module Psychic
       def task(task_name = nil)
         return list_tasks if options[:list]
         abort 'You must specify a task name, run with -l for a list of known tasks' unless task_name
+        command_template = runner.command_for_task(task_name)
         if options[:print]
-          print_task task_name, *extra_args
+          say command_template.command({}, *extra_args)
         else
           execute_task task_name, *extra_args
         end
@@ -105,7 +106,7 @@ module Psychic
           runner.known_tasks.map do |task|
             task_id = set_color(task, :bold)
             if options[:verbose]
-              details = runner.task_for(task)
+              details = runner.command_for_task(task)
               details = details.call if details.respond_to? :call
               details = "\n#{details}".lines.join('  ') if details.lines.size > 1
               say "#{task_id}: #{details}"

@@ -67,7 +67,7 @@ module Psychic
         known_tasks.include?(task_name.to_s)
       end
 
-      def task_for(task_name)
+      def command_for_task(task_name)
         tasks[task_name] if tasks.include? task_name
       end
 
@@ -79,7 +79,7 @@ module Psychic
 
       def find_task(task_name, *_args)
         task_name = task_name.to_s
-        command = task_for(task_name)
+        command = command_for_task(task_name)
         command = command.call if command.respond_to? :call
         fail Psychic::Runner::TaskNotImplementedError, task_name if command.nil?
         Task.new(task_name, command, TASK_PRIORITY)

@@ -61,13 +61,13 @@ module Psychic
         init_attr(:env) { ENV.to_hash }
       end
 
-      def task_for(task_name)
+      def command_for_task(task_name)
         tasks[task_name] if tasks.include? task_name
       end
 
       def find_task(task_name, *_args)
         task_name = task_name.to_s
-        task = task_for(task_name)
+        task = command_for_task(task_name)
         task = task.call if task.respond_to? :call
         fail Psychic::Runner::TaskNotImplementedError, task_name if task.nil?
         task
@@ -91,8 +91,8 @@ module Psychic
         false
       end
 
-      def task_for_sample(code_sample)
-        script = task_for('run_sample')
+      def command_for_sample(code_sample)
+        script = command_for_task('run_sample')
         script = script.call if script.respond_to? :call
       end
 

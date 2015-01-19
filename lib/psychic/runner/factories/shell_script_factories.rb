@@ -16,14 +16,14 @@ module Psychic
           end
         end
 
-        def task_for(task_name)
+        def command_for_task(task_name)
           task = task_name.to_s
           script = Dir["#{@cwd}/scripts/#{task}{.sh,}"].first
           relativize_cmd(script) if script
         end
 
-        def task_for_sample(code_sample)
-          script = task_for('run_sample')
+        def command_for_sample(code_sample)
+          script = command_for_task('run_sample')
           if script
             "#{script} #{code_sample.source_file}"
           else

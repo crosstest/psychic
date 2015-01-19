@@ -5,18 +5,21 @@ module Psychic
         @sample_finder.find_sample(code_sample)
       end
 
-      def task_factory_for_sample(code_sample)
+      def command_for_sample(code_sample, properties)
         tf = @task_factories.sort_by do |tf|
           priority = tf.can_run_sample?(code_sample)
           priority ? priority : 0
         end.last
+
+        CommandTemplate.new(tf.command_for_sample(code_sample), properties)
       end
 
       def run_sample(code_sample_name, *args)
         code_sample = find_sample(code_sample_name)
         absolute_sample_file = code_sample.absolute_source_file
         process_parameters(absolute_sample_file)
-        execute(code_sample.command(self), *args)
+        command = command_for_sample(code_sample, { sample: code_sample_name, sample_file: code_sample.source_file }, *args)
+        execute(command.command)
       end
 
       def process_parameters(sample_file)

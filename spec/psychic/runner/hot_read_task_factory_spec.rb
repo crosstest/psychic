@@ -24,10 +24,10 @@ module Psychic
           end
         end
 
-        describe '#task_for' do
+        describe '#command_for_task' do
           context 'matching a task' do
             it 'builds the task command' do
-              expect(subject.task_for(:bootstrap)).to eq('foo')
+              expect(subject.command_for_task(:bootstrap)).to eq('foo')
             end
           end
 

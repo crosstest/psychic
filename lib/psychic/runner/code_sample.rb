@@ -15,11 +15,11 @@ module Psychic
       end
 
       def command(runner)
-        # FIXME: Just runner.task_for_sample(...) ?
-        command = runner.task_factory_for_sample(self).task_for_sample(self)
+        # FIXME: Just runner.command_for_sample(...) ?
+        command = runner.command_for_sample(self)
         # FIXME: Shouldn't this be relative to runner's cwd?
         # command ||= Psychic::Util.relativize(source_file, runner.cwd)
-        command ||= "./#{source_file}"
+        # command ||= "./#{source_file}"
         command = command.call if command.respond_to? :call
 
         command_params = { sample: name, sample_file: source_file }

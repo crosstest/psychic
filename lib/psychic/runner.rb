@@ -12,6 +12,7 @@ module Psychic
   class Runner
     autoload :MagicTaskFactory, 'psychic/runner/magic_task_factory'
     autoload :BaseRunner, 'psychic/runner/base_runner'
+    autoload :CommandTemplate, 'psychic/runner/command_template'
     autoload :Task, 'psychic/runner/task'
     autoload :CodeSample, 'psychic/runner/code_sample'
     autoload :SampleFinder, 'psychic/runner/sample_finder'
@@ -54,10 +55,10 @@ module Psychic
       @sample_finder.known_samples
     end
 
-    def task_for(task_name)
+    def command_for_task(task_name)
       runner = runners.find { |r| r.known_task?(task_name) }
       return nil unless runner
-      runner.task_for(task_name)
+      CommandTemplate.new(runner.command_for_task(task_name))
     end
 
     private
