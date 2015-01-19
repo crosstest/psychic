@@ -5,6 +5,13 @@ module Psychic
         @sample_finder.find_sample(code_sample)
       end
 
+      def task_factory_for_sample(code_sample)
+        tf = @task_factories.sort_by do |tf|
+          priority = tf.can_run_sample?(code_sample)
+          priority ? priority : 0
+        end.last
+      end
+
       def run_sample(code_sample_name, *args)
         code_sample = find_sample(code_sample_name)
         absolute_sample_file = code_sample.absolute_source_file

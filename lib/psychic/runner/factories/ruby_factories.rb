@@ -7,6 +7,7 @@ module Psychic
         magic_file '.bundle/config'
         magic_env_var 'BUNDLE_GEMFILE'
         register_task_factory
+        runs '*.rb'
 
         task :bootstrap do
           'bundle install'

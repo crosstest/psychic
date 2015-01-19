@@ -15,7 +15,8 @@ module Psychic
       end
 
       def command(runner)
-        command = runner.task_for('run_sample')
+        # FIXME: Just runner.task_for_sample(...) ?
+        command = runner.task_factory_for_sample(self).task_for_sample(self)
         # FIXME: Shouldn't this be relative to runner's cwd?
         # command ||= Psychic::Util.relativize(source_file, runner.cwd)
         command ||= "./#{source_file}"

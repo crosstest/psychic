@@ -6,6 +6,8 @@ module Psychic
         EXTENSIONS = ['.sh', '']
         magic_file 'scripts/*'
         register_task_factory
+        runs '.sh', 5
+        runs '*', 1
 
         def initialize(opts)
           super
@@ -17,20 +19,27 @@ module Psychic
         def task_for(task_name)
           task = task_name.to_s
           script = Dir["#{@cwd}/scripts/#{task}{.sh,}"].first
-          if script
-            cmd = Psychic::Util.relativize(script, @cwd)
-            cmd = [cmd, args_for_task(task_name)].compact.join(' ')
-            "./#{cmd}" unless cmd.to_s.start_with? '/'
-          end
+          relativize_cmd(script) if script
         end
 
-        def args_for_task(task)
-          # HACK: Need a better way to deal with args
-          '{{sample_file}}' if task == 'run_sample'
+        def task_for_sample(code_sample)
+          script = task_for('run_sample')
+          if script
+            "#{script} #{code_sample.source_file}"
+          else
+            relativize_cmd(code_sample.absolute_source_file)
+          end
         end
 
         def active?
           true
+        end
+
+        private
+
+        def relativize_cmd(cmd)
+          cmd = Psychic::Util.relativize(cmd, @cwd)
+          "./#{cmd}" unless cmd.to_s.start_with? '/'
         end
       end
     end

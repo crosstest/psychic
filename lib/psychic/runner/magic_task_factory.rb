@@ -32,6 +32,14 @@ module Psychic
           @known_tasks ||= []
         end
 
+        def run_patterns
+          @run_patterns ||= []
+        end
+
+        def runs(pattern, run_priority = 5)
+          run_patterns << [pattern, run_priority]
+        end
+
         def tasks
           @tasks ||= {}
         end
@@ -73,6 +81,19 @@ module Psychic
           return true if ENV[var]
         end
         false
+      end
+
+      def can_run_sample?(code_sample)
+        path = Pathname(code_sample.absolute_source_file)
+        self.class.run_patterns.each do | pattern, run_priority |
+          return run_priority if path.fnmatch?(pattern)
+        end
+        false
+      end
+
+      def task_for_sample(code_sample)
+        script = task_for('run_sample')
+        script = script.call if script.respond_to? :call
       end
 
       def known_task?(task_name)
