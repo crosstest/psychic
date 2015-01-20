@@ -8,7 +8,7 @@ gemspec
 branch = begin
            File.read(File.expand_path('../maintenance-branch', __FILE__)).chomp
          rescue
-           'working'
+           'master'
          end
 
 %w(crosstest-core).each do |lib|
