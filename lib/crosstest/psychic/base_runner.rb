@@ -49,7 +49,7 @@ module Crosstest
         base.extend(ClassMethods)
       end
 
-      def initialize(opts = {})
+      def initialize(opts = {}) # rubocop:disable Metrics/AbcSize
         @opts = opts
         @priority = TASK_PRIORITY
         init_attr(:cwd) { Dir.pwd }
@@ -68,7 +68,7 @@ module Crosstest
       end
 
       def command_for_task(task_name)
-        tasks[task_name] if tasks.include? task_name
+        tasks[task_name]
       end
 
       def execute(command, *args)

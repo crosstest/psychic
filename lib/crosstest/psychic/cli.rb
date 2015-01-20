@@ -21,12 +21,10 @@ module Crosstest
 
     class CLI < RunnerCLI
       desc 'task <name>', 'Executes any task by name'
-      method_option :list, aliases: '-l', desc: 'List known tasks'
       method_option :verbose, aliases: '-v', desc: 'Verbose: display more details'
       method_option :cwd, desc: 'Working directory for detecting and running commands'
       method_option :print, aliases: '-p', desc: 'Print the command (or script) instead of running it'
       def task(task_name = nil)
-        return list_tasks if options[:list]
         abort 'You must specify a task name, run with -l for a list of known tasks' unless task_name
         command_template = runner.command_for_task(task_name)
         if options[:print]
@@ -102,12 +100,11 @@ module Crosstest
         desc 'tasks', 'List known tasks'
         method_option :verbose, aliases: '-v', desc: 'Verbose: display more details'
         method_option :cwd, desc: 'Working directory for detecting and running commands'
-        def tasks
+        def tasks # rubocop:disable Metrics/AbcSize
           runner.known_tasks.map do |task|
             task_id = set_color(task, :bold)
             if options[:verbose]
               details = runner.command_for_task(task)
-              details = details.call if details.respond_to? :call
               details = "\n#{details}".lines.join('  ') if details.lines.size > 1
               say "#{task_id}: #{details}"
             else

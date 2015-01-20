@@ -17,7 +17,7 @@ module Crosstest
         super
       end
 
-      def can_run_sample?(code_sample)
+      def can_run_sample?(_code_sample)
         if known_task? :run_sample
           9
         else
@@ -25,7 +25,7 @@ module Crosstest
         end
       end
 
-      def command_for_sample(code_sample)
+      def command_for_sample(_code_sample)
         command_for_task(:run_sample)
       end
     end

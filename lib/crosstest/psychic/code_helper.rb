@@ -71,7 +71,7 @@ module Crosstest
 
       def highlighted_code(formatter = 'terminal256')
         Highlighter.new(language: language, filename: absolute_source_file,
-          formatter: formatter).highlight(source)
+                        formatter: formatter).highlight(source)
       end
 
       def code_block(source_code, language, opts = { format: :markdown })

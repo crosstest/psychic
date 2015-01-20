@@ -21,6 +21,5 @@ branch = begin
   end
 end
 
-
 gem 'pry'
 gem 'rouge'

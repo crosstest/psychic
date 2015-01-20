@@ -30,7 +30,7 @@ module Crosstest
     include SampleRunner
     attr_reader :runners, :hot_read_task_factory, :task_factories, :sample_factories
 
-    def initialize(opts = { cwd: Dir.pwd }) # rubocop:disable Metrics/MethodLength
+    def initialize(opts = { cwd: Dir.pwd }) # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
       # TODO: Will reduce method length after further splitting Runner vs TaskFactory
       fail 'cwd is required' unless opts[:cwd]
       # must be a string on windows...

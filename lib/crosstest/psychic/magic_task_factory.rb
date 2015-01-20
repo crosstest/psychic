@@ -91,9 +91,9 @@ module Crosstest
         false
       end
 
-      def command_for_sample(code_sample)
+      def command_for_sample(_code_sample)
         script = command_for_task('run_sample')
-        script = script.call if script.respond_to? :call
+        script.call if script.respond_to? :call
       end
 
       def known_task?(task_name)
