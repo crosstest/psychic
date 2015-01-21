@@ -38,7 +38,7 @@ module Crosstest
 
         def relativize_cmd(cmd)
           cmd = Crosstest::Core::FileSystem.relativize(cmd, @cwd)
-          "& \"./#{cmd}\"" unless cmd.to_s.start_with? '/'
+          "PowerShell -NoProfile -ExecutionPolicy Bypass -File \"#{cmd}\""
         end
       end
     end
