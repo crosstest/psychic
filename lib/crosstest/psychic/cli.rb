@@ -5,7 +5,7 @@ require 'crosstest/psychic'
 
 module Crosstest
   class Psychic
-    class PsychicCLI < Crosstest::Core::CLI
+    class BaseCLI < Crosstest::Core::CLI
       no_commands do
         def runner
           @runner ||= setup_runner
@@ -13,13 +13,15 @@ module Crosstest
 
         def setup_runner
           runner_opts = { cwd: Dir.pwd, cli: shell, parameters: options.parameters }
-          runner_opts.merge!(Util.symbolized_hash(options))
+          runner_opts.merge!(Crosstest::Core::Util.symbolized_hash(options))
           Crosstest::Psychic.new(runner_opts)
         end
       end
     end
 
-    class CLI < RunnerCLI
+    class CLI < BaseCLI
+      BUILT_IN_TASKS = %w(bootstrap)
+
       desc 'task <name>', 'Executes any task by name'
       method_option :verbose, aliases: '-v', desc: 'Verbose: display more details'
       method_option :cwd, desc: 'Working directory for detecting and running commands'
@@ -86,7 +88,7 @@ module Crosstest
         end
       end
 
-      class List < RunnerCLI
+      class List < BaseCLI
         desc 'samples', 'Lists known code samples'
         method_option :verbose, aliases: '-v', desc: 'Verbose: display more details'
         method_option :cwd, desc: 'Working directory for detecting and running commands'
@@ -114,7 +116,7 @@ module Crosstest
         end
       end
 
-      class Show < RunnerCLI
+      class Show < BaseCLI
         desc 'sample <name>', 'Show detailed information about a code sample'
         method_option :verbose, aliases: '-v', desc: 'Verbose: display more details'
         method_option :cwd, desc: 'Working directory for detecting and running commands'
