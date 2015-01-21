@@ -2,9 +2,9 @@ module Crosstest
   class Psychic
     class HotReadTaskFactory
       include BaseRunner
-      def initialize(opts = {})
+      def initialize(runner, opts = {})
         super
-        @tasks = hints['tasks'] || {}
+        @tasks = runner.hints['tasks'] || {}
         @known_tasks = @tasks.keys
       end
 

@@ -49,7 +49,8 @@ module Crosstest
         base.extend(ClassMethods)
       end
 
-      def initialize(opts = {}) # rubocop:disable Metrics/AbcSize
+      def initialize(runner, opts = {}) # rubocop:disable Metrics/AbcSize
+        @runner = runner
         @opts = opts
         @priority = TASK_PRIORITY
         init_attr(:cwd) { Dir.pwd }
@@ -122,7 +123,7 @@ module Crosstest
       end
 
       def load_hints
-        hints_file = Dir["#{@cwd}/psychic.{yaml,yml}"].first
+        hints_file = Dir.glob("#{@cwd}/psychic.{yaml,yml}", File::FNM_CASEFOLD).first
         YAML.load(File.read(hints_file)) unless hints_file.nil?
       end
 

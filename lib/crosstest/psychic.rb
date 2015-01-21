@@ -40,13 +40,14 @@ module Crosstest
       init_hints
       init_attr(:logger) { new_logger }
       init_attr(:env) { ENV.to_hash }
+      init_attr(:os) { detect_os }
       init_attrs :cli, :interactive, :parameter_mode, :restore_mode, :print
       @shell_opts = select_shell_opts
       @parameters = load_parameters(opts[:parameters])
       # super
-      @hot_read_task_factory = HotReadTaskFactory.new(opts)
+      @hot_read_task_factory = HotReadTaskFactory.new(self, opts)
       @sample_finder = SampleFinder.new(opts[:cwd], @hot_read_task_factory.hints['samples'])
-      @task_factories = TaskFactoryRegistry.active_task_factories(opts)
+      @task_factories = TaskFactoryRegistry.activate_task_factories(self, opts)
       @runners = [@hot_read_task_factory, @task_factories].flatten
       @known_tasks = @runners.flat_map(&:known_tasks).uniq
     end
@@ -89,7 +90,7 @@ module Crosstest
     end
 
     def load_hints
-      hints_file = Dir["#{@cwd}/psychic.{yaml,yml}"].first
+      hints_file = Dir.glob("#{@cwd}/psychic.{yaml,yml}", File::FNM_CASEFOLD).first
       YAML.load(File.read(hints_file)) unless hints_file.nil?
     end
 
@@ -108,6 +109,22 @@ module Crosstest
       end
       parameters = Tokens.replace_tokens(File.read(file), @env)
       YAML.load(parameters)
+    end
+
+    def detect_os
+      host_os = RbConfig::CONFIG['host_os']
+      case host_os
+      when /mswin|msys|mingw|cygwin|bccwin|wince|emc/
+        :windows
+      when /darwin|mac os/
+        :macosx
+      when /linux/
+        :linux
+      when /solaris|bsd/
+        :unix
+      else
+        :unknown
+      end
     end
   end
 end

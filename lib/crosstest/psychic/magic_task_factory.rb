@@ -51,7 +51,8 @@ module Crosstest
         end
       end
 
-      def initialize(opts = {})
+      def initialize(runner, opts = {})
+        @runner = runner
         @opts = opts
         @priority = self.class::TASK_PRIORITY
         init_attr(:cwd) { Dir.pwd }
@@ -75,7 +76,7 @@ module Crosstest
 
       def active?
         self.class.magic_file_patterns.each do | pattern |
-          return true unless Dir["#{@cwd}/#{pattern}"].empty?
+          return true unless Dir.glob("#{@cwd}/#{pattern}", File::FNM_CASEFOLD).empty?
         end
         self.class.magic_env_vars.each do | var |
           return true if ENV[var]
