@@ -2,6 +2,7 @@ module Crosstest
   class Psychic
     class CommandTemplate
       def initialize(command_template, params = {})
+        raise ArgumentError, "Cannot create a nil command" if command_template.nil?
         @command_template = command_template
         @params = params
         @command = build_command

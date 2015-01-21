@@ -1,5 +1,6 @@
 require 'crosstest/psychic/version'
 require 'crosstest/core'
+require 'crosstest/psychic/error'
 
 autoload :Thor, 'thor'
 autoload :YAML, 'yaml'
@@ -19,11 +20,6 @@ module Crosstest
     autoload :SampleRunner, 'crosstest/psychic/sample_runner'
     autoload :HotReadTaskFactory, 'crosstest/psychic/hot_read_task_factory'
     autoload :TaskFactoryRegistry, 'crosstest/psychic/task_factory_registry'
-    class TaskNotImplementedError < NotImplementedError
-      def initialize(task_name)
-        super("task #{task_name} is not implemented")
-      end
-    end
     TaskFactoryRegistry.autoload_task_factories!
 
     include BaseRunner

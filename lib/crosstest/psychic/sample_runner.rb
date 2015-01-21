@@ -5,12 +5,13 @@ module Crosstest
         @sample_finder.find_sample(code_sample)
       end
 
-      def command_for_sample(code_sample, properties)
+      def command_for_sample(code_sample, properties = {})
         tf = @task_factories.sort_by do |factory|
           priority = factory.can_run_sample?(code_sample)
           priority ? priority : 0
         end.last
 
+        fail Crosstest::Psychic::SampleNotRunnable, code_sample if tf.nil?
         CommandTemplate.new(tf.command_for_sample(code_sample), properties)
       end
 
