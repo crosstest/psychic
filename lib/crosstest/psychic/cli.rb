@@ -55,7 +55,7 @@ module Crosstest
 
         def print_sample(sample_name, *args)
           sample = runner.find_sample(sample_name)
-          say "#{sample.command(runner)} #{args.join ' '}\n"
+          say runner.command_for_sample(sample, *args)
         end
 
         def execute_sample(sample_name, *args)
@@ -80,6 +80,7 @@ module Crosstest
       method_option :interactive, desc: 'Prompt for parameters?', enum: %w(always missing), lazy_default: 'missing'
       method_option :parameters, desc: 'YAML file containing key/value parameters. Default: psychic-parameters.yaml'
       method_option :parameter_mode, desc: 'How should the parameters be passed?', enum: %w(tokens arguments env)
+      method_option :os, desc: "Target OS (default value is `RbConfig::CONFIG['host_os']`)"
       method_option :print, aliases: '-p', desc: 'Print the command (or script) instead of running it', lazy_default: true
       def sample(sample_name = nil)
         abort 'You must specify a sample name, run `psychic list samples` for a list of known samples' unless sample_name

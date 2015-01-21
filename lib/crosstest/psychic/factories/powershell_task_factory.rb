@@ -30,6 +30,10 @@ module Crosstest
           end
         end
 
+        def can_run_sample?(code_sample)
+          5 if known_task? :run_sample
+        end
+
         def active?
           true if runner.os_family == :windows
         end
