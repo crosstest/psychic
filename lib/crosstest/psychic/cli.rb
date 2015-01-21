@@ -25,10 +25,12 @@ module Crosstest
       desc 'task <name>', 'Executes any task by name'
       method_option :verbose, aliases: '-v', desc: 'Verbose: display more details'
       method_option :cwd, desc: 'Working directory for detecting and running commands'
+      method_option :os, desc: "Target OS (default value is `RbConfig::CONFIG['host_os']`)"
       method_option :print, aliases: '-p', desc: 'Print the command (or script) instead of running it'
       def task(task_name = nil)
-        abort 'You must specify a task name, run with -l for a list of known tasks' unless task_name
+        abort 'You must specify a task name, run `psychic list tasks` for a list of known tasks' unless task_name
         command_template = runner.command_for_task(task_name)
+        abort "No usable command was found for task #{task_name}" if command_template.nil?
         if options[:print]
           say command_template.command({}, *extra_args)
         else

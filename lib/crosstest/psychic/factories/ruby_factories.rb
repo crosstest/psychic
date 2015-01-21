@@ -9,6 +9,13 @@ module Crosstest
         register_task_factory
         runs '*.rb'
 
+        def active?
+          # Avoid detecting crosstest's own BUNDLE_GEMFILE variable
+          Bundler.with_clean_env do
+            super
+          end
+        end
+
         task :bootstrap do
           'bundle install'
         end

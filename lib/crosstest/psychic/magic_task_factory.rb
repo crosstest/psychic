@@ -5,7 +5,7 @@ module Crosstest
 
       TASK_PRIORITY = 5
 
-      attr_reader :known_tasks, :tasks, :cwd, :env, :hints, :priority
+      attr_reader :known_tasks, :tasks, :cwd, :env, :hints, :priority, :runner
 
       class << self
         def register_task_factory

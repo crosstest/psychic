@@ -7,7 +7,7 @@ module Crosstest
       include Crosstest::Shell
       include Crosstest::Core::Logger
 
-      attr_reader :known_tasks, :tasks, :cwd, :env, :hints, :priority
+      attr_reader :known_tasks, :tasks, :cwd, :env, :hints, :priority, :runner
 
       module ClassMethods
         def register_task_factory

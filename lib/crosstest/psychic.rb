@@ -28,7 +28,7 @@ module Crosstest
 
     include BaseRunner
     include SampleRunner
-    attr_reader :runners, :hot_read_task_factory, :task_factories, :sample_factories
+    attr_reader :runners, :hot_read_task_factory, :task_factories, :sample_factories, :os
 
     def initialize(opts = { cwd: Dir.pwd }) # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
       # TODO: Will reduce method length after further splitting Runner vs TaskFactory
@@ -40,7 +40,7 @@ module Crosstest
       init_hints
       init_attr(:logger) { new_logger }
       init_attr(:env) { ENV.to_hash }
-      init_attr(:os) { detect_os }
+      init_attr(:os) { RbConfig::CONFIG['host_os'] }
       init_attrs :cli, :interactive, :parameter_mode, :restore_mode, :print
       @shell_opts = select_shell_opts
       @parameters = load_parameters(opts[:parameters])
@@ -60,6 +60,21 @@ module Crosstest
       runner = runners.find { |r| r.known_task?(task_name) }
       return nil unless runner
       CommandTemplate.new(runner.command_for_task(task_name))
+    end
+
+    def os_family
+      case os
+      when /mswin|msys|mingw|cygwin|bccwin|wince|emc/
+        :windows
+      when /darwin|mac os/
+        :macosx
+      when /linux/
+        :linux
+      when /solaris|bsd/
+        :unix
+      else
+        :unknown
+      end
     end
 
     private
@@ -109,22 +124,6 @@ module Crosstest
       end
       parameters = Tokens.replace_tokens(File.read(file), @env)
       YAML.load(parameters)
-    end
-
-    def detect_os
-      host_os = RbConfig::CONFIG['host_os']
-      case host_os
-      when /mswin|msys|mingw|cygwin|bccwin|wince|emc/
-        :windows
-      when /darwin|mac os/
-        :macosx
-      when /linux/
-        :linux
-      when /solaris|bsd/
-        :unix
-      else
-        :unknown
-      end
     end
   end
 end
