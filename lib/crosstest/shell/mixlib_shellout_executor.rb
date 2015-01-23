@@ -54,6 +54,7 @@ module Crosstest
         return nil if shell.nil?
 
         ExecutionResult.new(
+          command: shell.command,
           exitstatus: shell.exitstatus,
           stdout: shell.stdout,
           stderr: shell.stderr
