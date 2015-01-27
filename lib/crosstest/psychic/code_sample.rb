@@ -2,14 +2,16 @@ require 'crosstest/psychic/code_helper'
 
 module Crosstest
   class Psychic
-    class CodeSample < Struct.new(:name, :source_file, :basedir)
+    class CodeSample < Struct.new(:name, :source_file, :basedir, :opts)
       include CodeHelper
       include Crosstest::OutputHelper
       extend Forwardable
       def_delegators :source_file, :extname
-      # property :name
-      # property :basedir
-      # property :source_file
+
+      def inititalize(*args)
+        super
+        @opts ||= {}
+      end
 
       def token_handler
         # Default token pattern/replacement (used by php-opencloud) should be configurable
@@ -43,6 +45,10 @@ module Crosstest
         source_file.to_s
       end
 
+      def tokenized?
+        opts[:parameter_mode] == 'tokens'
+      end
+
       private
 
       def display_source
@@ -52,7 +58,7 @@ module Crosstest
       end
 
       def display_tokens
-        return status 'Tokens', '(None)' if token_handler.tokens.empty?
+        return status 'Tokens', '(None)' if !tokenized? || token_handler.tokens.empty?
 
         status 'Tokens'
         indent do
