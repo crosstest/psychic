@@ -10,9 +10,9 @@ module Crosstest
           }
         end
         let(:hints) do
-          {
+          Hints.new({
             'tasks' => task_map
-          }
+          })
         end
         let(:runner) { double('runner', hints: hints) }
         let(:shell) { Crosstest::Shell.shell = double('shell') }

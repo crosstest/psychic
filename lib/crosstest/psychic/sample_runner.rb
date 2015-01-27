@@ -42,8 +42,8 @@ module Crosstest
       protected
 
       def find_in_hints(code_sample)
-        return unless hints['samples']
-        hints['samples'].each do |k, v|
+        return unless hints.samples
+        hints.samples.each do |k, v|
           return v if k.downcase == code_sample.downcase
         end
         nil

@@ -1,9 +1,9 @@
 require 'crosstest/psychic/version'
 require 'crosstest/core'
 require 'crosstest/psychic/error'
+require 'yaml'
 
 autoload :Thor, 'thor'
-autoload :YAML, 'yaml'
 
 module Crosstest
   autoload :Shell,  'crosstest/shell'
@@ -14,6 +14,7 @@ module Crosstest
       autoload :RegexpTokenHandler,   'crosstest/psychic/tokens'
       autoload :MustacheTokenHandler,   'crosstest/psychic/tokens'
     end
+    autoload :Hints, 'crosstest/psychic/hints'
     autoload :FileFinder, 'crosstest/psychic/file_finder'
     autoload :FactoryManager, 'crosstest/psychic/factory_manager'
     autoload :ScriptFactoryManager, 'crosstest/psychic/script_factory_manager'
@@ -107,10 +108,9 @@ module Crosstest
     end
 
     def init_hints
-      @hints = Crosstest::Core::Util.stringified_hash(@opts[:hints] || load_hints || {})
-      if @hints['options']
-        @opts.merge! Crosstest::Core::Util.symbolized_hash(@hints['options'])
-      end
+      hint_data = Crosstest::Core::Util.symbolized_hash(@opts[:hints] || load_hints || {})
+      @hints = Hints.new hint_data
+      @opts.merge! Crosstest::Core::Util.symbolized_hash(@hints.options)
     end
 
     def select_shell_opts

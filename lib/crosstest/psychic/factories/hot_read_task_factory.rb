@@ -7,7 +7,7 @@ module Crosstest
 
         def initialize(runner, opts = {})
           super
-          @tasks = runner.hints['tasks'] || {}
+          @tasks = runner.hints.tasks
           @known_tasks = @tasks.keys
         end
 
@@ -25,7 +25,7 @@ module Crosstest
         register_script_factory
 
         def sample_hints
-          task_runner.hints['samples'] || {}
+          task_runner.hints.samples
         end
 
         def known_script?(script)

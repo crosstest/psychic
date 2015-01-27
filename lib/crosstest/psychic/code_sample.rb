@@ -2,11 +2,16 @@ require 'crosstest/psychic/code_helper'
 
 module Crosstest
   class Psychic
-    class CodeSample < Struct.new(:name, :source_file, :basedir, :opts)
+    class CodeSample < Core::Dash
       include CodeHelper
       include Crosstest::OutputHelper
       extend Forwardable
       def_delegators :source_file, :extname
+
+      required_field :name, String
+      required_field :source_file, Pathname
+      field :basedir, Pathname
+      field :opts, Hash, default: {}
 
       def inititalize(*args)
         super

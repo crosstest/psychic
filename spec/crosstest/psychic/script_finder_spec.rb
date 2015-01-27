@@ -24,9 +24,9 @@ module Crosstest
           samples = subject.known_scripts
           expect(samples.size).to eq(2)
           expect(samples[0].name).to eq('foo')
-          expect(samples[0].source_file).to eq('/path/to/foo.c')
+          expect(samples[0].source_file.to_s).to eq('/path/to/foo.c')
           expect(samples[1].name).to eq('bar')
-          expect(samples[1].source_file).to eq('/path/to/bar.rb')
+          expect(samples[1].source_file.to_s).to eq('/path/to/bar.rb')
         end
       end
     end
