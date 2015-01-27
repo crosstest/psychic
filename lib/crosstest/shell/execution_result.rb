@@ -23,8 +23,12 @@ module Crosstest
         @stderr = results.fetch(:stderr).force_encoding('utf-8')
       end
 
+      def successful?
+        @exitstatus == 0
+      end
+
       def error!
-        if @exitstatus != 0
+        unless successful?
           error = ExecutionError.new
           error.execution_result = self
           fail error

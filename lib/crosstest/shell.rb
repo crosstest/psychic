@@ -3,6 +3,7 @@ module Crosstest
     autoload :ExecutionResult, 'crosstest/shell/execution_result'
     autoload :ExecutionError, 'crosstest/shell/execution_result'
     autoload :MixlibShellOutExecutor, 'crosstest/shell/mixlib_shellout_executor'
+    autoload :BuffShellOutExecutor, 'crosstest/shell/buff_shellout_executor'
 
     AVAILABLE_OPTIONS = [
       # All MixLib::ShellOut options - though we don't use most of these
@@ -16,7 +17,7 @@ module Crosstest
     end
 
     def self.shell
-      @shell ||=  MixlibShellOutExecutor.new
+      @shell ||= RUBY_PLATFORM == 'java' ? BuffShellOutExecutor.new : MixlibShellOutExecutor.new
     end
 
     def shell

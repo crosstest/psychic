@@ -20,7 +20,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'crosstest-core', '~> 0'
   spec.add_dependency 'mixlib-shellout', '~> 1.3' # Used for MRI
-  # spec.add_dependency "buff-shell_out", "~> 0.1"  # Used for JRuby
+  spec.add_dependency 'buff-shell_out', '~> 0.2'  # Used for JRuby
   spec.add_dependency 'mustache', '~> 0.99'
   spec.add_development_dependency 'bundler', '~> 1.5'
   spec.add_development_dependency 'rake', '~> 10.0'
