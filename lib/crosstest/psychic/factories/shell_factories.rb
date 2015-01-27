@@ -1,13 +1,26 @@
 module Crosstest
   class Psychic
     module Factories
-      class ShellScriptTaskFactory < MagicTaskFactory
-        TASK_PRIORITY = 1
+      module ShellBase
         EXTENSIONS = ['.sh', '']
+
+        def active?
+          true unless runner.os_family == :windows
+        end
+
+        protected
+
+        def relativize_cmd(cmd)
+          cmd = Crosstest::Core::FileSystem.relativize(cmd, @cwd)
+          "./#{cmd}" unless cmd.to_s.start_with? '/'
+        end
+      end
+
+      class ShellTaskFactory < MagicTaskFactory
+        include ShellBase
+        TASK_PRIORITY = 1
         magic_file 'scripts/*'
         register_task_factory
-        runs '.sh', 5
-        runs '*', 1
 
         def initialize(*args)
           super
@@ -21,6 +34,12 @@ module Crosstest
           script = Dir.glob("#{@cwd}/scripts/#{task}{.sh,}", File::FNM_CASEFOLD).first
           relativize_cmd(script) if script
         end
+      end
+
+      class ShellScriptFactory < ScriptFactory
+        include ShellBase
+        runs_extension '.sh', 5
+        runs_extension '*', 1
 
         def command_for_sample(code_sample)
           script = command_for_task('run_sample')
@@ -29,17 +48,6 @@ module Crosstest
           else
             relativize_cmd(code_sample.absolute_source_file)
           end
-        end
-
-        def active?
-          true unless runner.os_family == :windows
-        end
-
-        private
-
-        def relativize_cmd(cmd)
-          cmd = Crosstest::Core::FileSystem.relativize(cmd, @cwd)
-          "./#{cmd}" unless cmd.to_s.start_with? '/'
         end
       end
     end

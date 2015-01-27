@@ -2,11 +2,11 @@ require 'spec_helper'
 
 module Crosstest
   class Psychic
-    RSpec.describe SampleFinder do
+    RSpec.describe ScriptFinder do
       context 'without hints' do
-        describe '#known_samples' do
+        describe '#known_scripts' do
           it 'returns an empty list' do
-            expect(subject.known_samples).to be_empty
+            expect(subject.known_scripts).to be_empty
           end
         end
       end
@@ -21,7 +21,7 @@ module Crosstest
         subject { described_class.new(Dir.pwd, hints) }
 
         it 'returns the samples from the hints' do
-          samples = subject.known_samples
+          samples = subject.known_scripts
           expect(samples.size).to eq(2)
           expect(samples[0].name).to eq('foo')
           expect(samples[0].source_file).to eq('/path/to/foo.c')

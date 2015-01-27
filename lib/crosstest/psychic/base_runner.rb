@@ -11,7 +11,7 @@ module Crosstest
 
       module ClassMethods
         def register_task_factory
-          Crosstest::Psychic::TaskFactoryRegistry.register(self)
+          Crosstest::Psychic::TaskFactoryManager.register_factory(self)
         end
 
         def magic_file_patterns

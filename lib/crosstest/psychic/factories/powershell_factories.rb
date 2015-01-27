@@ -6,7 +6,6 @@ module Crosstest
         EXTENSIONS = ['.ps1']
         magic_file 'scripts/*.ps1'
         register_task_factory
-        runs '.ps1', 5
 
         def initialize(runner, opts = {})
           super
@@ -21,19 +20,6 @@ module Crosstest
           relativize_cmd(script) if script
         end
 
-        def command_for_sample(code_sample)
-          script = command_for_task('run_sample')
-          if script
-            "#{script} #{code_sample.source_file}"
-          else
-            relativize_cmd(code_sample.absolute_source_file)
-          end
-        end
-
-        def can_run_sample?(code_sample)
-          5 if known_task? :run_sample
-        end
-
         def active?
           true if runner.os_family == :windows
         end
@@ -43,6 +29,23 @@ module Crosstest
         def relativize_cmd(cmd)
           cmd = Crosstest::Core::FileSystem.relativize(cmd, @cwd)
           "PowerShell -NoProfile -ExecutionPolicy Bypass -File \"#{cmd}\""
+        end
+      end
+
+      class PowerShellScriptFactory < ScriptFactory
+        runs_extension 'ps1', 5
+
+        def active?
+          true if runner.os_family == :windows
+        end
+
+        def command_for_sample(code_sample)
+          script = runner.command_for_task('run_sample')
+          if script
+            "#{script} #{code_sample.source_file}"
+          else
+            relativize_cmd(code_sample.absolute_source_file)
+          end
         end
       end
     end

@@ -21,10 +21,9 @@ module Crosstest
 
       describe 'initialize' do
         it 'should create a HotReadTaskFactory for the specified directory' do
-          expect(subject.hot_read_task_factory).to(
-            be_an_instance_of Crosstest::Psychic::HotReadTaskFactory
-          )
-          expect(subject.cwd).to eq(current_dir)
+          hot_task_factory = subject.task_factory_manager.active? Psychic::Factories::HotReadTaskFactory
+          expect(hot_task_factory).to_not be nil
+          expect(hot_task_factory.cwd).to eq(current_dir)
         end
       end
     end
@@ -36,10 +35,10 @@ module Crosstest
       end
 
       describe 'initialize' do
-        it 'should create a ShellScriptTaskFactory' do
-          expect(subject.task_factories).to include(
-            an_instance_of(Crosstest::Psychic::Factories::ShellScriptTaskFactory)
-          )
+        it 'should create a ShellTaskFactory' do
+          shell_task_factory = subject.task_factory_manager.active? Psychic::Factories::ShellTaskFactory
+          expect(shell_task_factory).to_not be nil
+          expect(shell_task_factory.cwd).to eq(current_dir)
         end
       end
     end

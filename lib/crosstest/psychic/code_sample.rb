@@ -5,13 +5,15 @@ module Crosstest
     class CodeSample < Struct.new(:name, :source_file, :basedir)
       include CodeHelper
       include Crosstest::OutputHelper
+      extend Forwardable
+      def_delegators :source_file, :extname
       # property :name
       # property :basedir
       # property :source_file
 
       def token_handler
         # Default token pattern/replacement (used by php-opencloud) should be configurable
-        @token_handler ||= RegexpTokenHandler.new(source, /'\{(\w+)\}'/, "'\\1'")
+        @token_handler ||= Tokens::RegexpTokenHandler.new(source, /'\{(\w+)\}'/, "'\\1'")
       end
 
       def command(runner)

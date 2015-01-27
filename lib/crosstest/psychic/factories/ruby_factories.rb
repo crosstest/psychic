@@ -7,7 +7,6 @@ module Crosstest
         magic_file '.bundle/config'
         magic_env_var 'BUNDLE_GEMFILE'
         register_task_factory
-        runs '*.rb'
 
         def active?
           # Avoid detecting crosstest's own BUNDLE_GEMFILE variable
@@ -19,9 +18,21 @@ module Crosstest
         task :bootstrap do
           'bundle install'
         end
+      end
 
-        task :run_sample do
-          'bundle exec ruby {{sample_file}}'
+      class RubyFactory < ScriptFactory
+        register_script_factory
+        runs_extension 'rb'
+
+        def command_for_sample(code_sample)
+          cmd = bundler_active? ? "bundle exec " : ""
+          cmd << "ruby {{sample_file}}"
+        end
+
+        protected
+
+        def bundler_active?
+          task_runner.task_factory_manager.active? BundlerTaskFactory
         end
       end
     end

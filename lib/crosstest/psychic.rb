@@ -10,21 +10,28 @@ module Crosstest
   autoload :OutputHelper, 'crosstest/output_helper'
   class Psychic
     autoload :Tokens,   'crosstest/psychic/tokens'
+    module Tokens
+      autoload :RegexpTokenHandler,   'crosstest/psychic/tokens'
+      autoload :MustacheTokenHandler,   'crosstest/psychic/tokens'
+    end
     autoload :FileFinder, 'crosstest/psychic/file_finder'
+    autoload :FactoryManager, 'crosstest/psychic/factory_manager'
+    autoload :ScriptFactoryManager, 'crosstest/psychic/script_factory_manager'
+    autoload :TaskFactoryManager, 'crosstest/psychic/task_factory_manager'
     autoload :MagicTaskFactory, 'crosstest/psychic/magic_task_factory'
+    autoload :ScriptFactory, 'crosstest/psychic/script_factory'
     autoload :BaseRunner, 'crosstest/psychic/base_runner'
     autoload :CommandTemplate, 'crosstest/psychic/command_template'
     autoload :Task, 'crosstest/psychic/task'
     autoload :CodeSample, 'crosstest/psychic/code_sample'
-    autoload :SampleFinder, 'crosstest/psychic/sample_finder'
+    autoload :ScriptFinder, 'crosstest/psychic/script_finder'
     autoload :SampleRunner, 'crosstest/psychic/sample_runner'
-    autoload :HotReadTaskFactory, 'crosstest/psychic/hot_read_task_factory'
-    autoload :TaskFactoryRegistry, 'crosstest/psychic/task_factory_registry'
-    TaskFactoryRegistry.autoload_task_factories!
+
+    FactoryManager.autoload_factories!
 
     include BaseRunner
     include SampleRunner
-    attr_reader :runners, :hot_read_task_factory, :task_factories, :sample_factories, :os
+    attr_reader :task_factory_manager, :script_factory_manager, :script_finder, :os, :hints
 
     def initialize(opts = { cwd: Dir.pwd }) # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
       # TODO: Will reduce method length after further splitting Runner vs TaskFactory
@@ -41,21 +48,32 @@ module Crosstest
       @shell_opts = select_shell_opts
       @parameters = load_parameters(opts[:parameters])
       # super
-      @hot_read_task_factory = HotReadTaskFactory.new(self, opts)
-      @sample_finder = SampleFinder.new(opts[:cwd], @hot_read_task_factory.hints['samples'])
-      @task_factories = TaskFactoryRegistry.activate_task_factories(self, opts)
-      @runners = [@hot_read_task_factory, @task_factories].flatten
-      @known_tasks = @runners.flat_map(&:known_tasks).uniq
+      @task_factory_manager = TaskFactoryManager.new(self, opts)
+      @script_factory_manager = ScriptFactoryManager.new(self, opts)
+      @script_finder = ScriptFinder.new(opts[:cwd], hints)
     end
 
-    def known_samples
-      @sample_finder.known_samples
+    def CodeSample(code_sample)
+      return code_sample if code_sample.is_a? CodeSample
+      find_script(code_sample)
+    end
+
+    def find_script(code_sample_name, *_args)
+      script_finder.find_script(code_sample_name)
+    end
+
+    def known_scripts
+      script_finder.known_scripts
+    end
+
+    def known_tasks
+      task_factory_manager.known_tasks
     end
 
     def command_for_task(task_name)
-      runner = runners.find { |r| r.known_task?(task_name) }
-      return nil unless runner
-      CommandTemplate.new(runner.command_for_task(task_name))
+      task_factory = task_factory_manager.factory_for(task_name)
+      fail TaskNotImplementedError, task_name if task_factory.nil?
+      CommandTemplate.new(task_factory.command_for_task(task_name))
     end
 
     def os_family

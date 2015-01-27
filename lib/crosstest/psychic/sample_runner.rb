@@ -1,22 +1,16 @@
 module Crosstest
   class Psychic
     module SampleRunner
-      def find_sample(code_sample, *_args)
-        @sample_finder.find_sample(code_sample)
-      end
-
       def command_for_sample(code_sample, properties = {})
-        tf = @task_factories.sort_by do |factory|
-          priority = factory.can_run_sample?(code_sample)
-          priority ? priority : 0
-        end.last
+        script_factory = script_factory_manager.factory_for(code_sample)
 
-        fail Crosstest::Psychic::SampleNotRunnable, code_sample if tf.nil?
-        CommandTemplate.new(tf.command_for_sample(code_sample), properties)
+        fail Crosstest::Psychic::SampleNotRunnable, code_sample if script_factory.nil?
+        command = script_factory.command_for_sample(code_sample)
+        CommandTemplate.new(command, properties)
       end
 
       def run_sample(code_sample_name, *args)
-        code_sample = find_sample(code_sample_name)
+        code_sample = find_script(code_sample_name)
         absolute_sample_file = code_sample.absolute_source_file
         process_parameters(absolute_sample_file)
         command = command_for_sample(code_sample, {

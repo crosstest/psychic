@@ -9,7 +9,7 @@ module Crosstest
 
       class << self
         def register_task_factory
-          Crosstest::Psychic::TaskFactoryRegistry.register(self)
+          Crosstest::Psychic::TaskFactoryManager.register_factory(self)
         end
 
         def magic_file_patterns
@@ -32,13 +32,6 @@ module Crosstest
           @known_tasks ||= []
         end
 
-        def run_patterns
-          @run_patterns ||= []
-        end
-
-        def runs(pattern, run_priority = 5)
-          run_patterns << [pattern, run_priority]
-        end
 
         def tasks
           @tasks ||= {}
@@ -82,19 +75,6 @@ module Crosstest
           return true if ENV[var]
         end
         false
-      end
-
-      def can_run_sample?(code_sample)
-        path = Pathname(code_sample.absolute_source_file)
-        self.class.run_patterns.each do | pattern, run_priority |
-          return run_priority if path.fnmatch?(pattern)
-        end
-        false
-      end
-
-      def command_for_sample(_code_sample)
-        script = command_for_task('run_sample')
-        script.call if script.respond_to? :call
       end
 
       def known_task?(task_name)

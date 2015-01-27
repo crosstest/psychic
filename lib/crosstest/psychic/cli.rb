@@ -54,7 +54,7 @@ module Crosstest
         end
 
         def print_sample(sample_name, *args)
-          sample = runner.find_sample(sample_name)
+          sample = runner.find_script(sample_name)
           say runner.command_for_sample(sample, *args)
         end
 
@@ -96,7 +96,7 @@ module Crosstest
         method_option :verbose, aliases: '-v', desc: 'Verbose: display more details'
         method_option :cwd, desc: 'Working directory for detecting and running commands'
         def samples
-          samples = runner.known_samples.map do |sample|
+          samples = runner.known_scripts.map do |sample|
             [set_color(sample.name, :bold), sample.source_file]
           end
           print_table samples
@@ -124,7 +124,7 @@ module Crosstest
         method_option :verbose, aliases: '-v', desc: 'Verbose: display more details'
         method_option :cwd, desc: 'Working directory for detecting and running commands'
         def sample(sample_name)
-          sample = runner.find_sample(sample_name)
+          sample = runner.find_script(sample_name)
           say sample.to_s(options[:verbose])
         end
       end
