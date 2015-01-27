@@ -32,7 +32,6 @@ module Crosstest
           @known_tasks ||= []
         end
 
-
         def tasks
           @tasks ||= {}
         end

@@ -2,7 +2,7 @@ module Crosstest
   class Psychic
     class ScriptFactoryManager < FactoryManager
       def find_by_ext(ext)
-        active_factories.find{ |factory| factory.can_run_extension? ext }
+        active_factories.find { |factory| factory.can_run_extension? ext }
       end
 
       def factory_for(code_sample)

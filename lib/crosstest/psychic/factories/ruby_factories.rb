@@ -24,9 +24,9 @@ module Crosstest
         register_script_factory
         runs_extension 'rb'
 
-        def command_for_sample(code_sample)
-          cmd = bundler_active? ? "bundle exec " : ""
-          cmd << "ruby {{sample_file}}"
+        def command_for_sample(_code_sample)
+          cmd = bundler_active? ? 'bundle exec ' : ''
+          cmd << 'ruby {{sample_file}}'
         end
 
         protected

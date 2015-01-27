@@ -11,20 +11,19 @@ module Crosstest
       runs_extension 'fake_js'
     end
 
-
     RSpec.describe ScriptFactoryManager do
       let(:runner) { instance_double(Psychic) }
       let(:opts) do
         {}
       end
-      let(:subject) {
+      let(:subject) do
         described_class.new runner, opts
-      }
+      end
 
-      before(:each) {
+      before(:each) do
         described_class.register_factory(FakeRubyFactory)
         described_class.register_factory(FakeJavaScriptFactory)
-      }
+      end
 
       describe '#initialize' do
         it 'creates instances of registered factories' do

@@ -38,7 +38,7 @@ module Crosstest
 
       def active?(klass)
         factories.find do | factory |
-          factory.kind_of? klass
+          factory.is_a? klass
         end
       end
     end

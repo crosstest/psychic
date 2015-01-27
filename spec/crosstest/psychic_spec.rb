@@ -54,7 +54,7 @@ module Crosstest
 
     context 'running scripts' do
       describe '#run_sample' do
-         before(:each) do
+        before(:each) do
           write_file 'samples/hi.rb', 'puts "hi"'
         end
 
@@ -77,10 +77,10 @@ module Crosstest
 
         context 'by hint' do
           let(:hints) do
-            """
+            ''"
             samples:
               custom: samples/hi.rb
-            """
+            "''
           end
           before(:each) { write_file 'psychic.yaml', hints }
 

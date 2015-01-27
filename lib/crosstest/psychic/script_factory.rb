@@ -44,8 +44,8 @@ module Crosstest
         self.class.priority_for_extension(extname)
       end
 
-      def command_for_sample(code_sample)
-        raise NotImplementedError, 'This should be implemented by subclasses'
+      def command_for_sample(_code_sample)
+        fail NotImplementedError, 'This should be implemented by subclasses'
       end
     end
   end
