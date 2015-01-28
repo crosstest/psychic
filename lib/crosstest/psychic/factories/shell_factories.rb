@@ -46,6 +46,8 @@ module Crosstest
         end
 
         def priority_for_script(code_sample)
+          return 7 if shell_task_factory.known_task? :run_sample
+
           case code_sample.extname
           when '.sh'
             9

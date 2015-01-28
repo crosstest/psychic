@@ -21,18 +21,23 @@ module Crosstest
     autoload :TaskFactoryManager, 'crosstest/psychic/task_factory_manager'
     autoload :MagicTaskFactory, 'crosstest/psychic/magic_task_factory'
     autoload :ScriptFactory, 'crosstest/psychic/script_factory'
-    autoload :BaseRunner, 'crosstest/psychic/base_runner'
     autoload :CommandTemplate, 'crosstest/psychic/command_template'
     autoload :Task, 'crosstest/psychic/task'
     autoload :CodeSample, 'crosstest/psychic/code_sample'
     autoload :ScriptFinder, 'crosstest/psychic/script_finder'
     autoload :SampleRunner, 'crosstest/psychic/sample_runner'
+    autoload :TaskRunner, 'crosstest/psychic/task_runner'
 
     FactoryManager.autoload_factories!
 
-    include BaseRunner
+    include Core::Logger
+    include Shell
+    include TaskRunner
     include SampleRunner
-    attr_reader :task_factory_manager, :script_factory_manager, :script_finder, :os, :hints, :parameters
+    attr_reader :cwd, :env, :task_factory_manager, :script_factory_manager, :script_finder, :os, :hints, :parameters
+
+    DEFAULT_PARAMS_FILE = 'psychic-parameters.yaml'
+
 
     def initialize(opts = { cwd: Dir.pwd }) # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
       # TODO: Will reduce method length after further splitting Runner vs TaskFactory

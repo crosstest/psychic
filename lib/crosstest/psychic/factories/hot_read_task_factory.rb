@@ -1,8 +1,7 @@
 module Crosstest
   class Psychic
     module Factories
-      class HotReadTaskFactory
-        include BaseRunner
+      class HotReadTaskFactory < MagicTaskFactory
         register_task_factory
 
         def initialize(psychic, opts = {})

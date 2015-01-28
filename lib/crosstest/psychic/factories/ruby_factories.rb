@@ -22,7 +22,7 @@ module Crosstest
 
       class RubyFactory < ScriptFactory
         register_script_factory
-        runs '**.rb'
+        runs '**.rb', 8
 
         def command_for_sample(_code_sample)
           cmd = bundler_active? ? 'bundle exec ' : ''
