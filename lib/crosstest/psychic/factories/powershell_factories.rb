@@ -39,12 +39,12 @@ module Crosstest
           true if psychic.os_family == :windows
         end
 
-        def command_for_sample(code_sample)
-          script = psychic.command_for_task('run_sample')
+        def command_for_script(script)
+          script = psychic.command_for_task('run_script')
           if script
-            "#{script} #{code_sample.source_file}"
+            "#{script} #{script.source_file}"
           else
-            relativize_cmd(code_sample.absolute_source_file)
+            relativize_cmd(script.absolute_source_file)
           end
         end
       end

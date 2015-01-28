@@ -25,7 +25,7 @@ module Crosstest
         described_class.register_factory(FakeJavaScriptFactory)
       end
 
-      def fake_code_sample(name)
+      def fake_script(name)
         write_file name, ''
         psychic.find_script name
       end
@@ -40,14 +40,14 @@ module Crosstest
 
       describe '#factories_for' do
         it 'returns nil if no factories can run the script' do
-          expect(subject.factories_for fake_code_sample('foo.asdf')).to be_empty
+          expect(subject.factories_for fake_script('foo.asdf')).to be_empty
         end
 
         it 'returns the factories that can run the script' do
-          expect(subject.factories_for fake_code_sample('foo.fake_rb')).to include(
+          expect(subject.factories_for fake_script('foo.fake_rb')).to include(
             an_instance_of FakeRubyFactory
           )
-          expect(subject.factories_for fake_code_sample('foo.fake_js')).to include(
+          expect(subject.factories_for fake_script('foo.fake_js')).to include(
             an_instance_of FakeJavaScriptFactory
           )
         end

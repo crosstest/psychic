@@ -23,9 +23,9 @@ module Crosstest
     autoload :ScriptFactory, 'crosstest/psychic/script_factory'
     autoload :CommandTemplate, 'crosstest/psychic/command_template'
     autoload :Task, 'crosstest/psychic/task'
-    autoload :CodeSample, 'crosstest/psychic/code_sample'
+    autoload :Script, 'crosstest/psychic/script'
     autoload :ScriptFinder, 'crosstest/psychic/script_finder'
-    autoload :SampleRunner, 'crosstest/psychic/sample_runner'
+    autoload :ScriptRunner, 'crosstest/psychic/script_runner'
     autoload :TaskRunner, 'crosstest/psychic/task_runner'
 
     FactoryManager.autoload_factories!
@@ -33,7 +33,7 @@ module Crosstest
     include Core::Logger
     include Shell
     include TaskRunner
-    include SampleRunner
+    include ScriptRunner
     attr_reader :cwd, :env, :task_factory_manager, :script_factory_manager, :script_finder, :os, :hints, :parameters
 
     DEFAULT_PARAMS_FILE = 'psychic-parameters.yaml'
@@ -59,13 +59,13 @@ module Crosstest
       @script_finder = ScriptFinder.new(opts[:cwd], hints)
     end
 
-    def CodeSample(code_sample)
-      return code_sample if code_sample.is_a? CodeSample
-      find_script(code_sample)
+    def Script(script)
+      return script if script.is_a? Script
+      find_script(script)
     end
 
-    def find_script(code_sample_name, *_args)
-      script_finder.find_script(code_sample_name)
+    def find_script(script_name, *_args)
+      script_finder.find_script(script_name)
     end
 
     def known_scripts
@@ -84,6 +84,8 @@ module Crosstest
     end
 
     def execute(command_template, *args)
+      # Crossdoc sends raw strings to execute...
+      command_template = CommandTemplate.new(command_template, {}, *args) if command_template.is_a? String
       fail ArgumentError, 'Execute requires a CommandTemplate' unless command_template.is_a? CommandTemplate
       full_cmd = command_template.command(*args)
       logger.info("Executing: #{full_cmd}")

@@ -1,35 +1,35 @@
 module Crosstest
   class Psychic
-    module SampleRunner
-      def command_for_sample(code_sample, *args)
-        script_factory = script_factory_manager.factories_for(code_sample).last
+    module ScriptRunner
+      def command_for_script(script, *args)
+        script_factory = script_factory_manager.factories_for(script).last
 
-        fail Crosstest::Psychic::SampleNotRunnable, code_sample if script_factory.nil?
-        command = script_factory.command_for_sample(code_sample)
+        fail Crosstest::Psychic::ScriptNotRunnable, script if script_factory.nil?
+        command = script_factory.command_for_script(script)
         command_params = parameters.merge(
-          sample: code_sample.name,
-          sample_file: code_sample.source_file
+          script: script.name,
+          script_file: script.source_file
         )
         CommandTemplate.new(command, command_params, *args)
       end
 
-      def run_sample(code_sample_name, *args)
-        code_sample = find_script(code_sample_name)
-        absolute_sample_file = code_sample.absolute_source_file
-        process_parameters(absolute_sample_file)
-        command = command_for_sample(code_sample, *args)
+      def run_script(script_name, *args)
+        script = find_script(script_name)
+        absolute_script_file = script.absolute_source_file
+        process_parameters(absolute_script_file)
+        command = command_for_script(script, *args)
         execute(command)
       end
 
-      def process_parameters(sample_file)
+      def process_parameters(script_file)
         if templated?
-          backup_and_overwrite(sample_file)
+          backup_and_overwrite(script_file)
 
-          template = File.read(sample_file)
+          template = File.read(script_file)
           # Default token pattern/replacement (used by php-opencloud) should be configurable
           token_handler = Tokens::RegexpTokenHandler.new(template, /'\{(\w+)\}'/, "'\\1'")
           confirm_or_update_parameters(token_handler.tokens)
-          File.write(sample_file, token_handler.render(@parameters))
+          File.write(script_file, token_handler.render(@parameters))
         end
       end
 
@@ -43,10 +43,10 @@ module Crosstest
 
       protected
 
-      def find_in_hints(code_sample)
-        return unless hints.samples
-        hints.samples.each do |k, v|
-          return v if k.downcase == code_sample.downcase
+      def find_in_hints(script)
+        return unless hints.scripts
+        hints.scripts.each do |k, v|
+          return v if k.downcase == script.downcase
         end
         nil
       end
@@ -66,7 +66,7 @@ module Crosstest
       def should_restore?(file, orig, timing = :before)
         return true if [timing, 'always']. include? @restore_mode
         if interactive?
-          @cli.yes? "Would you like to #{file} to #{orig} before running the sample?"
+          @cli.yes? "Would you like to #{file} to #{orig} before running the script?"
         end
       end
 

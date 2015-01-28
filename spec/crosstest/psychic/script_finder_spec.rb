@@ -20,13 +20,13 @@ module Crosstest
         end
         subject { described_class.new(Dir.pwd, hints) }
 
-        it 'returns the samples from the hints' do
-          samples = subject.known_scripts
-          expect(samples.size).to eq(2)
-          expect(samples[0].name).to eq('foo')
-          expect(samples[0].source_file.to_s).to eq('/path/to/foo.c')
-          expect(samples[1].name).to eq('bar')
-          expect(samples[1].source_file.to_s).to eq('/path/to/bar.rb')
+        it 'returns the scripts from the hints' do
+          scripts = subject.known_scripts
+          expect(scripts.size).to eq(2)
+          expect(scripts[0].name).to eq('foo')
+          expect(scripts[0].source_file.to_s).to eq('/path/to/foo.c')
+          expect(scripts[1].name).to eq('bar')
+          expect(scripts[1].source_file.to_s).to eq('/path/to/bar.rb')
         end
       end
     end

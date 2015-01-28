@@ -53,14 +53,14 @@ module Crosstest
     end
 
     context 'running scripts' do
-      describe '#run_sample' do
+      describe '#run_script' do
         before(:each) do
           write_file 'samples/hi.rb', 'puts "hi"'
         end
 
         shared_examples 'executes' do
           it 'captures output' do
-            execution_result = subject.run_sample(script)
+            execution_result = subject.run_script(script)
             expect(execution_result.stdout).to include('hi')
           end
         end
@@ -78,7 +78,7 @@ module Crosstest
         context 'by hint' do
           let(:hints) do
             ''"
-            samples:
+            scripts:
               custom: samples/hi.rb
             "''
           end

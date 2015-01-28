@@ -6,9 +6,9 @@ module Crosstest
       end
     end
 
-    class SampleNotRunnable < NotImplementedError
-      def initialize(code_sample)
-        super("no active script factories no how to run #{code_sample.source_file}")
+    class ScriptNotRunnable < NotImplementedError
+      def initialize(script)
+        super("no active script factories no how to run #{script.source_file}")
       end
     end
   end

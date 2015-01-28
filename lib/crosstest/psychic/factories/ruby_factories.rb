@@ -24,9 +24,9 @@ module Crosstest
         register_script_factory
         runs '**.rb', 8
 
-        def command_for_sample(_code_sample)
+        def command_for_script(_script)
           cmd = bundler_active? ? 'bundle exec ' : ''
-          cmd << 'ruby {{sample_file}}'
+          cmd << 'ruby {{script_file}}'
         end
 
         protected

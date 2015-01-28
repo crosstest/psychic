@@ -53,15 +53,15 @@ module Crosstest
           say_status :success, task_name
         end
 
-        def print_sample(sample_name, *args)
-          sample = psychic.find_script(sample_name)
-          say psychic.command_for_sample(sample, *args)
+        def print_script(script_name, *args)
+          script = psychic.find_script(script_name)
+          say psychic.command_for_script(script, *args)
         end
 
-        def execute_sample(sample_name, *args)
-          result = psychic.run_sample(sample_name, *args)
+        def execute_script(script_name, *args)
+          result = psychic.run_script(script_name, *args)
           result.error!
-          say_status :success, sample_name
+          say_status :success, script_name
         end
       end
 
@@ -74,7 +74,7 @@ module Crosstest
         end
       end
 
-      desc 'sample <name>', 'Executes a code sample'
+      desc 'script <name>', 'Executes a script'
       method_option :verbose, aliases: '-v', desc: 'Verbose: display more details'
       method_option :cwd, desc: 'Working directory for detecting and running commands'
       method_option :interactive, desc: 'Prompt for parameters?', enum: %w(always missing), lazy_default: 'missing'
@@ -82,24 +82,24 @@ module Crosstest
       method_option :parameter_mode, desc: 'How should the parameters be passed?', enum: %w(tokens arguments env)
       method_option :os, desc: "Target OS (default value is `RbConfig::CONFIG['host_os']`)"
       method_option :print, aliases: '-p', desc: 'Print the command (or script) instead of running it', lazy_default: true
-      def sample(sample_name = nil)
-        abort 'You must specify a sample name, run `psychic list samples` for a list of known samples' unless sample_name
+      def script(script_name = nil)
+        abort 'You must specify a script name, run `psychic list scripts` for a list of known scripts' unless script_name
         if options[:print]
-          print_sample sample_name, *extra_args
+          print_script script_name, *extra_args
         else
-          execute_sample sample_name, *extra_args
+          execute_script script_name, *extra_args
         end
       end
 
       class List < BaseCLI
-        desc 'samples', 'Lists known code samples'
+        desc 'scripts', 'Lists known scripts'
         method_option :verbose, aliases: '-v', desc: 'Verbose: display more details'
         method_option :cwd, desc: 'Working directory for detecting and running commands'
-        def samples
-          samples = psychic.known_scripts.map do |sample|
-            [set_color(sample.name, :bold), sample.source_file]
+        def scripts
+          scripts = psychic.known_scripts.map do |script|
+            [set_color(script.name, :bold), script.source_file]
           end
-          print_table samples
+          print_table scripts
         end
 
         desc 'tasks', 'List known tasks'
@@ -120,22 +120,22 @@ module Crosstest
       end
 
       class Show < BaseCLI
-        desc 'sample <name>', 'Show detailed information about a code sample'
+        desc 'script <name>', 'Show detailed information about a script'
         method_option :verbose, aliases: '-v', desc: 'Verbose: display more details'
         method_option :cwd, desc: 'Working directory for detecting and running commands'
-        def sample(sample_name)
-          sample = psychic.find_script(sample_name)
-          say sample.to_s(options[:verbose])
+        def script(script_name)
+          script = psychic.find_script(script_name)
+          say script.to_s(options[:verbose])
         end
       end
 
-      desc 'list', 'List known tasks or code samples'
+      desc 'list', 'List known tasks or scripts'
       subcommand 'list', List
-      desc 'show', 'Show details about a task or code sample'
+      desc 'show', 'Show details about a task or script'
       subcommand 'show', Show
 
       no_commands do
-        def show_sample(_sample_name)
+        def show_script(_script_name)
         end
       end
     end

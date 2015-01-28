@@ -3,7 +3,7 @@ module Crosstest
     class Hints < Crosstest::Core::Dash
       field :options, Hash, default: {}
       field :tasks, Hash[String => String]
-      field :samples, Hash[String => Pathname]
+      field :scripts, Hash[String => Pathname]
 
       def options
         self[:options] ||= {}
@@ -13,8 +13,8 @@ module Crosstest
         self[:tasks] ||= {}
       end
 
-      def samples
-        self[:samples] ||= {}
+      def scripts
+        self[:scripts] ||= {}
       end
     end
   end

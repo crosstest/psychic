@@ -45,38 +45,38 @@ module Crosstest
           psychic.task_factory_manager.active? ShellTaskFactory
         end
 
-        def priority_for_script(code_sample)
-          return 7 if shell_task_factory.known_task? :run_sample
+        def priority_for_script(script)
+          return 7 if shell_task_factory.known_task? :run_script
 
-          case code_sample.extname
+          case script.extname
           when '.sh'
             9
           when ''
             7
           else
-            5 if has_shebang?(code_sample)
+            5 if has_shebang?(script)
           end
         end
 
-        def command_for_sample(code_sample)
-          script = script_command
-          if script
-            "#{script} #{code_sample.source_file}"
+        def command_for_script(script)
+          base_command = run_script_command
+          if base_command
+            "#{base_command} #{script.source_file}"
           else
-            relativize_cmd(code_sample.absolute_source_file)
+            relativize_cmd(script.absolute_source_file)
           end
         end
 
         protected
 
-        def script_command
-          psychic.command_for_task('run_sample')
+        def run_script_command
+          psychic.command_for_task('run_script')
         rescue TaskNotImplementedError
           nil
         end
 
-        def has_shebang?(code_sample)
-          first_line = code_sample.source.lines[0]
+        def has_shebang?(script)
+          first_line = script.source.lines[0]
           first_line && first_line.match(/\#\!/)
         end
       end

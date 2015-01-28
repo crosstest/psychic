@@ -36,7 +36,7 @@ module Crosstest
               expect(subject.command_for_task(:bootstrap)).to eq('foo')
             end
 
-            pending 'test priority when multiple factories implement run_sample'
+            pending 'test priority when multiple factories implement run_script'
           end
 
           context 'not matching a task' do

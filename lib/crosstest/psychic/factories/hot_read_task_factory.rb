@@ -23,30 +23,30 @@ module Crosstest
       class HotReadScriptFactory < ScriptFactory
         register_script_factory
 
-        def sample_hints
-          psychic.hints.samples
+        def script_hints
+          psychic.hints.scripts
         end
 
         def known_script?(script)
-          sample_hints.key? script
+          script_hints.key? script
         end
 
         def hot_task_factory
           psychic.task_factory_manager.active? HotReadTaskFactory
         end
 
-        def priority_for_script(code_sample)
-          if known_script? code_sample
+        def priority_for_script(script)
+          if known_script? script
             9
-          elsif hot_task_factory.known_task? :run_sample
+          elsif hot_task_factory.known_task? :run_script
             7
           else
             nil
           end
         end
 
-        def command_for_sample(code_sample)
-          sample_hints[code_sample] || hot_task_factory.command_for_task(:run_sample)
+        def command_for_script(script)
+          script_hints[script] || hot_task_factory.command_for_task(:run_script)
         end
       end
     end
