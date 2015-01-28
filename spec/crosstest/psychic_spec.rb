@@ -26,6 +26,13 @@ module Crosstest
           expect(hot_task_factory.cwd).to eq(current_dir)
         end
       end
+
+      describe '#execute' do
+        it 'can accept a string' do
+          execution_result = subject.execute('echo', 'hi')
+          expect(execution_result.stdout).to match(/\Ahi\Z/)
+        end
+      end
     end
 
     context 'when scripts/* exist' do
