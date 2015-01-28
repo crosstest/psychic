@@ -12,7 +12,7 @@ module Crosstest
     end
 
     RSpec.describe ScriptFactoryManager do
-      let(:psychic) { instance_double(Psychic) }
+      let(:psychic) { Psychic.new(cwd: current_dir) }
       let(:opts) do
         {}
       end
@@ -25,6 +25,11 @@ module Crosstest
         described_class.register_factory(FakeJavaScriptFactory)
       end
 
+      def fake_code_sample(name)
+        write_file name, ''
+        psychic.find_script name
+      end
+
       describe '#initialize' do
         it 'creates instances of registered factories' do
           expect(subject.factories).to include(
@@ -33,14 +38,18 @@ module Crosstest
         end
       end
 
-      describe '#find_by_ext' do
-        it 'returns nil if no engines can run the extension' do
-          expect(subject.find_by_ext 'foo').to be nil
+      describe '#factories_for' do
+        it 'returns nil if no factories can run the script' do
+          expect(subject.factories_for fake_code_sample('foo.asdf')).to be_empty
         end
 
-        it 'returns the engine for a given extension' do
-          expect(subject.find_by_ext 'fake_rb').to be_an_instance_of(FakeRubyFactory)
-          expect(subject.find_by_ext 'fake_js').to be_an_instance_of(FakeJavaScriptFactory)
+        it 'returns the factories that can run the script' do
+          expect(subject.factories_for fake_code_sample('foo.fake_rb')).to include(
+            an_instance_of FakeRubyFactory
+          )
+          expect(subject.factories_for fake_code_sample('foo.fake_js')).to include(
+            an_instance_of FakeJavaScriptFactory
+          )
         end
       end
     end

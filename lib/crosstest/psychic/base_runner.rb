@@ -76,12 +76,6 @@ module Crosstest
         tasks[task_name]
       end
 
-      def execute(command, *args)
-        full_cmd = [command, *args].join(' ')
-        logger.info("Executing: #{full_cmd}")
-        shell.execute(full_cmd, @shell_opts) unless print?
-      end
-
       def find_task(task_name, *_args)
         task_name = task_name.to_s
         command = command_for_task(task_name)

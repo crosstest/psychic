@@ -29,10 +29,10 @@ module Crosstest
       method_option :print, aliases: '-p', desc: 'Print the command (or script) instead of running it'
       def task(task_name = nil)
         abort 'You must specify a task name, run `psychic list tasks` for a list of known tasks' unless task_name
-        command_template = psychic.command_for_task(task_name)
+        command_template = psychic.command_for_task(task_name, *extra_args)
         abort "No usable command was found for task #{task_name}" if command_template.nil?
         if options[:print]
-          say command_template.command({}, *extra_args)
+          print_task task_name, *extra_args
         else
           execute_task task_name, *extra_args
         end

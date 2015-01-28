@@ -44,7 +44,7 @@ module Crosstest
       end
 
       def initialize(psychic, opts = {})
-        @psychic =psychic
+        @psychic = psychic
         @opts = opts
         @priority = self.class::TASK_PRIORITY
         init_attr(:cwd) { Dir.pwd }

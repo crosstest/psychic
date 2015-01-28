@@ -1,16 +1,16 @@
 module Crosstest
   class Psychic
     class CommandTemplate
-      def initialize(command_template, params = {})
+      def initialize(command_template, params, *extra_args)
         fail ArgumentError, 'Cannot create a nil command' if command_template.nil?
         @command_template = command_template
         @params = params
         @command = build_command
+        @extra_args = extra_args
       end
 
-      def command(params = {}, *args)
-        cmd_params = @params.merge(params)
-        [Tokens.replace_tokens(@command, cmd_params), *args].join(' ')
+      def command
+        [Tokens.replace_tokens(@command, @params), *@extra_args].join(' ')
       end
 
       alias_method :to_s, :command

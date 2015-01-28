@@ -23,8 +23,15 @@ module Crosstest
         expect { execution_result.error! }.to_not raise_error
       end
 
-      it 'returns an unsuccesful ExecutionResult if the command was not found' do
-        execution_result = subject.execute('missing', {})
+      it 'raises an ExecutionError immediately if the command was not found' do
+        execution_error = begin
+          subject.execute('missing', {})
+        rescue => e
+          e
+        end
+
+        expect(execution_error).to be_an_instance_of Shell::ExecutionError
+        execution_result = execution_error.execution_result
         expect(execution_result).to_not be_successful
         expect(execution_result.exitstatus).to_not eq(0)
         expect { execution_result.error! }.to raise_error(Shell::ExecutionError)

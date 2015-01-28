@@ -16,10 +16,11 @@ module Crosstest
             Buff::ShellOut.shell_out(command, env)
           end
         end
+        fail Errno::ENOENT, shell_result.stderr if shell_result.exitstatus == 127
         execution_result(command, shell_result)
       rescue SystemCallError => e
         execution_error = ExecutionError.new(e)
-        # execution_error.execution_result = execution_result(shell_result)
+        execution_error.execution_result = execution_result(command, shell_result)
         raise execution_error
       end
 

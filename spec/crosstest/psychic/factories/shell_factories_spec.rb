@@ -2,7 +2,7 @@ module Crosstest
   class Psychic
     module Factories
       RSpec.describe ShellTaskFactory do
-        let(:psychic) { double('psychic') }
+        let(:psychic) { Psychic.new(cwd: current_dir) }
         let(:shell) { Crosstest::Shell.shell = double('shell') }
         subject { described_class.new(psychic, cwd: current_dir) }
 

@@ -1,22 +1,24 @@
 module Crosstest
   class Psychic
     module SampleRunner
-      def command_for_sample(code_sample, properties = {})
+      def command_for_sample(code_sample, *args)
         script_factory = script_factory_manager.factories_for(code_sample).last
 
         fail Crosstest::Psychic::SampleNotRunnable, code_sample if script_factory.nil?
         command = script_factory.command_for_sample(code_sample)
-        CommandTemplate.new(command, properties)
+        command_params = parameters.merge(
+          sample: code_sample.name,
+          sample_file: code_sample.source_file
+        )
+        CommandTemplate.new(command, command_params, *args)
       end
 
       def run_sample(code_sample_name, *args)
         code_sample = find_script(code_sample_name)
         absolute_sample_file = code_sample.absolute_source_file
         process_parameters(absolute_sample_file)
-        command = command_for_sample(code_sample, {
-                                       sample: code_sample_name, sample_file: code_sample.source_file
-                                     }, *args)
-        execute(command.command)
+        command = command_for_sample(code_sample, *args)
+        execute(command)
       end
 
       def process_parameters(sample_file)

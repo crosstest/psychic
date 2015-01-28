@@ -7,8 +7,8 @@ module Crosstest
 
         def initialize(psychic, opts = {})
           super
-          @tasks = psychic.hints.tasks
-          @known_tasks = @tasks.keys
+          @tasks = psychic.hints.tasks || {}
+          @known_tasks = @tasks.keys || {}
         end
 
         def active?

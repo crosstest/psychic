@@ -74,7 +74,8 @@ module Crosstest
         end
 
         def has_shebang?(code_sample)
-          code_sample.source.lines[0].match(/\#\!/)
+          first_line = code_sample.source.lines[0]
+          first_line && first_line.match(/\#\!/)
         end
       end
     end
