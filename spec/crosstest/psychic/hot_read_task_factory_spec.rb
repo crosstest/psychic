@@ -35,6 +35,8 @@ module Crosstest
             it 'builds the task command' do
               expect(subject.command_for_task(:bootstrap)).to eq('foo')
             end
+
+            pending "test priority when multiple factories implement run_sample"
           end
 
           context 'not matching a task' do

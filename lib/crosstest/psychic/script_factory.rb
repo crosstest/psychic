@@ -20,7 +20,7 @@ module Crosstest
           run_patterns[ext] = priority
         end
 
-        def priority_for(code_sample)
+        def priority_for_script(code_sample)
           code_sample_path = Pathname(code_sample)
           run_patterns.each do | pattern, priority |
             return priority if code_sample_path.fnmatch(pattern, File::FNM_CASEFOLD)
@@ -51,7 +51,7 @@ module Crosstest
       end
 
       def priority_for_script(code_sample)
-        self.class.priority_for(code_sample)
+        self.class.priority_for_script(code_sample)
       end
 
       def command_for_sample(_code_sample)

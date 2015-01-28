@@ -3,12 +3,12 @@ require 'spec_helper'
 module Crosstest
   class Psychic
     class FakeRubyFactory < ScriptFactory
-      runs 'fake_rb'
-      runs 'fake_erb'
+      runs '**.fake_rb'
+      runs '**.fake_erb'
     end
 
     class FakeJavaScriptFactory < ScriptFactory
-      runs 'fake_js'
+      runs '**.fake_js'
     end
 
     RSpec.describe ScriptFactoryManager do

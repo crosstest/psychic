@@ -33,7 +33,7 @@ module Crosstest
       end
 
       class PowerShellScriptFactory < ScriptFactory
-        runs 'ps1', 5
+        runs '**.ps1', 5
 
         def active?
           true if psychic.os_family == :windows

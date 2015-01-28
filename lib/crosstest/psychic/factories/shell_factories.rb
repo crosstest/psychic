@@ -39,7 +39,7 @@ module Crosstest
       class ShellScriptFactory < ScriptFactory
         include ShellBase
         register_script_factory
-        runs '**/*.sh', 5
+        runs '**.sh', 5
 
         def shell_task_factory
           psychic.task_factory_manager.active? ShellTaskFactory
