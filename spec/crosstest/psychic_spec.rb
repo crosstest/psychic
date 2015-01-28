@@ -29,7 +29,12 @@ module Crosstest
 
       describe '#execute' do
         it 'can accept a string' do
-          execution_result = subject.execute('echo', 'hi')
+          if subject.os_family == :windows
+            cmd = 'Write-Host'
+          else
+            cmd = 'echo'
+          end
+          execution_result = subject.execute(cmd, 'hi')
           expect(execution_result.stdout).to match(/\Ahi\Z/)
         end
       end

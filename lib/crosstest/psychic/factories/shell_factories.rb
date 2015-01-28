@@ -76,7 +76,7 @@ module Crosstest
         end
 
         def shebang?(script)
-          first_line = script.source.lines[0]
+          first_line = script.source.lines.first
           first_line && first_line.match(/\#\!/)
         end
       end
