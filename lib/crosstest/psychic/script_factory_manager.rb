@@ -5,11 +5,12 @@ module Crosstest
         active_factories.find { |factory| factory.can_run_extension? ext }
       end
 
-      def factory_for(code_sample)
-        sf = active_factories.sort_by do |factory|
-          priority = factory.can_run_sample?(code_sample)
-          priority ? priority : 0
-        end.last
+      def factories_for(code_sample)
+        active_factories.select do | factory |
+          factory.priority_for_script(code_sample)
+        end.sort_by do |factory|
+          factory.priority_for_script(code_sample)
+        end
       end
     end
   end

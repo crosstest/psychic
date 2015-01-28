@@ -38,16 +38,43 @@ module Crosstest
 
       class ShellScriptFactory < ScriptFactory
         include ShellBase
-        runs_extension '.sh', 5
-        runs_extension '*', 1
+        register_script_factory
+        runs '**/*.sh', 5
+
+        def shell_task_factory
+          psychic.task_factory_manager.active? ShellTaskFactory
+        end
+
+        def priority_for_script(code_sample)
+          case code_sample.extname
+          when '.sh'
+            9
+          when ''
+            7
+          else
+            5 if has_shebang?(code_sample)
+          end
+        end
 
         def command_for_sample(code_sample)
-          script = command_for_task('run_sample')
+          script = script_command
           if script
             "#{script} #{code_sample.source_file}"
           else
             relativize_cmd(code_sample.absolute_source_file)
           end
+        end
+
+        protected
+
+        def script_command
+          psychic.command_for_task('run_sample')
+        rescue TaskNotImplementedError
+          nil
+        end
+
+        def has_shebang?(code_sample)
+          code_sample.source.lines[0].match(/\#\!/)
         end
       end
     end

@@ -39,13 +39,19 @@ module Crosstest
         true
       end
 
-      def can_run_extension?(ext)
-        self.class.extensions.include? ext
+      def known_scripts
+        cwd_path = Pathname(psychic.cwd)
+        self.class.run_patterns.flat_map do | pattern, _priority |
+          Dir[cwd_path.join(pattern)]
+        end
       end
 
-      def can_run_sample?(code_sample)
-        extname = task_runner.CodeSample(code_sample).extname
-        self.class.priority_for_extension(extname)
+      def known_script?(script)
+        known_scripts.include? Pathname(script)
+      end
+
+      def priority_for_script(code_sample)
+        self.class.priority_for(code_sample)
       end
 
       def command_for_sample(_code_sample)

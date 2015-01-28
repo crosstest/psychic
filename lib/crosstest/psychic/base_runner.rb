@@ -68,6 +68,10 @@ module Crosstest
         known_tasks.include?(task_name.to_s)
       end
 
+      def priority_for_task(task_name)
+        priority if known_task? task_name
+      end
+
       def command_for_task(task_name)
         tasks[task_name]
       end

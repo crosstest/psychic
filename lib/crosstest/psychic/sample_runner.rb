@@ -2,7 +2,7 @@ module Crosstest
   class Psychic
     module SampleRunner
       def command_for_sample(code_sample, properties = {})
-        script_factory = script_factory_manager.factory_for(code_sample)
+        script_factory = script_factory_manager.factories_for(code_sample).last
 
         fail Crosstest::Psychic::SampleNotRunnable, code_sample if script_factory.nil?
         command = script_factory.command_for_sample(code_sample)

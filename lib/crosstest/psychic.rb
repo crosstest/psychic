@@ -72,8 +72,8 @@ module Crosstest
     end
 
     def command_for_task(task_name)
-      task_factory = task_factory_manager.factory_for(task_name)
-      fail TaskNotImplementedError, task_name if task_factory.nil?
+      task_factory = task_factory_manager.factories_for(task_name).last
+      fail TaskNotImplementedError, task_name if task_factory.nil? || task_factory.priority == 0
       CommandTemplate.new(task_factory.command_for_task(task_name))
     end
 
