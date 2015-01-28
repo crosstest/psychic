@@ -38,7 +38,9 @@ module Crosstest
             context 'with scripts/*.ps1 files' do
               include_context 'with scripts/*.ps1 files' do
                 it 'returns the script command' do
-                  expect(subject.command_for_task :bootstrap).to eq('PowerShell -NoProfile -ExecutionPolicy Bypass -File "scripts/bootstrap.ps1"')
+                  expect(subject.command_for_task :bootstrap).to eq(
+                    'PowerShell -NoProfile -ExecutionPolicy Bypass -File "scripts/bootstrap.ps1"'
+                  )
                 end
               end
             end

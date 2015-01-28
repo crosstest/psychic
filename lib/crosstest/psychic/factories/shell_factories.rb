@@ -54,7 +54,7 @@ module Crosstest
           when ''
             7
           else
-            5 if has_shebang?(script)
+            5 if shebang?(script)
           end
         end
 
@@ -75,7 +75,7 @@ module Crosstest
           nil
         end
 
-        def has_shebang?(script)
+        def shebang?(script)
           first_line = script.source.lines[0]
           first_line && first_line.match(/\#\!/)
         end

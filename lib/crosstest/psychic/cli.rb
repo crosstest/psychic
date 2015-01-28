@@ -27,42 +27,19 @@ module Crosstest
       method_option :cwd, desc: 'Working directory for detecting and running commands'
       method_option :os, desc: "Target OS (default value is `RbConfig::CONFIG['host_os']`)"
       method_option :print, aliases: '-p', desc: 'Print the command (or script) instead of running it'
-      def task(task_name = nil)
+      def task(task_name = nil) # rubocop:disable Metrics/AbcSize
         abort 'You must specify a task name, run `psychic list tasks` for a list of known tasks' unless task_name
-        command_template = psychic.command_for_task(task_name, *extra_args)
-        abort "No usable command was found for task #{task_name}" if command_template.nil?
+        command = psychic.command_for_task(task_name, *extra_args)
         if options[:print]
-          print_task task_name, *extra_args
+          say command
         else
-          execute_task task_name, *extra_args
+          psychic.execute command
         end
+      rescue TaskNotImplementedError => e
+        abort "No usable command was found for task #{task_name}"
       rescue Crosstest::Shell::ExecutionError => e
         say_status :failed, task_name, :red
         say e.execution_result if e.execution_result
-      end
-
-      no_commands do
-        def print_task(task_name, *args)
-          task = psychic.find_task(task_name)
-          say "#{task.command} #{args.join ' '}\n"
-        end
-
-        def execute_task(task_name, *args)
-          result = psychic.execute_task(task_name, *args)
-          result.error!
-          say_status :success, task_name
-        end
-
-        def print_script(script_name, *args)
-          script = psychic.find_script(script_name)
-          say psychic.command_for_script(script, *args)
-        end
-
-        def execute_script(script_name, *args)
-          result = psychic.run_script(script_name, *args)
-          result.error!
-          say_status :success, script_name
-        end
       end
 
       BUILT_IN_TASKS.each do |task_name|
@@ -82,13 +59,19 @@ module Crosstest
       method_option :parameter_mode, desc: 'How should the parameters be passed?', enum: %w(tokens arguments env)
       method_option :os, desc: "Target OS (default value is `RbConfig::CONFIG['host_os']`)"
       method_option :print, aliases: '-p', desc: 'Print the command (or script) instead of running it', lazy_default: true
-      def script(script_name = nil)
+      def script(script_name = nil) # rubocop:disable Metrics/AbcSize
         abort 'You must specify a script name, run `psychic list scripts` for a list of known scripts' unless script_name
+        command = psychic.command_for_script(script_name, *extra_args)
         if options[:print]
-          print_script script_name, *extra_args
+          say command
         else
-          execute_script script_name, *extra_args
+          psychic.execute command
         end
+      rescue ScriptNotRunnable => e
+        abort "No usable command was found for task #{task_name}"
+      rescue Crosstest::Shell::ExecutionError => e
+        say_status :failed, task_name, :red
+        say e.execution_result if e.execution_result
       end
 
       class List < BaseCLI

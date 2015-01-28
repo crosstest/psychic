@@ -9,11 +9,11 @@ module Crosstest
         @extra_args = extra_args
       end
 
-      def command
+      def render
         [Tokens.replace_tokens(@command, @params), *@extra_args].join(' ')
       end
 
-      alias_method :to_s, :command
+      alias_method :to_s, :render
 
       private
 

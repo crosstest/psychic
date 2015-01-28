@@ -41,13 +41,15 @@ module Crosstest
 
           describe '#bootstrap' do
             it 'returns travis run install' do
-              expect(subject.find_task(:bootstrap)).to eq('travis run --skip-version-check install')
+              expect(subject.command_for_task(:bootstrap)).to eq(
+                'travis run --skip-version-check install'
+              )
             end
           end
 
           describe '#test' do
             it 'returns travis run script' do
-              expect(subject.find_task(:test)).to eq('travis run --skip-version-check script')
+              expect(subject.command_for_task(:test)).to eq('travis run --skip-version-check script')
             end
           end
         end

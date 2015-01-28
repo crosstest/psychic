@@ -1,6 +1,23 @@
 module Crosstest
   class Psychic
     module ScriptRunner
+      def script_factory_manager
+        @script_factory_manager ||= ScriptFactoryManager.new(self, opts)
+      end
+
+      def script_finder
+        @script_finder ||= ScriptFinder.new(opts[:cwd], hints)
+      end
+
+      def find_script(script)
+        return script if script.is_a? Script
+        script_finder.find_script(script)
+      end
+
+      def known_scripts
+        script_finder.known_scripts
+      end
+
       def command_for_script(script, *args)
         script_factory = script_factory_manager.factories_for(script).last
 

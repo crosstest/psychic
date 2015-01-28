@@ -34,10 +34,9 @@ module Crosstest
     include Shell
     include TaskRunner
     include ScriptRunner
-    attr_reader :cwd, :env, :task_factory_manager, :script_factory_manager, :script_finder, :os, :hints, :parameters
+    attr_reader :cwd, :env, :os, :hints, :parameters, :opts
 
     DEFAULT_PARAMS_FILE = 'psychic-parameters.yaml'
-
 
     def initialize(opts = { cwd: Dir.pwd }) # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
       # TODO: Will reduce method length after further splitting Runner vs TaskFactory
@@ -53,41 +52,15 @@ module Crosstest
       init_attrs :cli, :interactive, :parameter_mode, :restore_mode, :print
       @shell_opts = select_shell_opts
       @parameters = load_parameters(opts[:parameters])
-      # super
-      @task_factory_manager = TaskFactoryManager.new(self, opts)
-      @script_factory_manager = ScriptFactoryManager.new(self, opts)
-      @script_finder = ScriptFinder.new(opts[:cwd], hints)
     end
 
-    def Script(script)
-      return script if script.is_a? Script
-      find_script(script)
-    end
-
-    def find_script(script_name, *_args)
-      script_finder.find_script(script_name)
-    end
-
-    def known_scripts
-      script_finder.known_scripts
-    end
-
-    def known_tasks
-      task_factory_manager.known_tasks
-    end
-
-    def command_for_task(task_name, *args)
-      task_factory = task_factory_manager.factories_for(task_name).last
-      fail TaskNotImplementedError, task_name if task_factory.nil? || task_factory.priority == 0
-      command = task_factory.command_for_task(task_name)
-      CommandTemplate.new(command, parameters, *args)
-    end
-
-    def execute(command_template, *args)
+    def execute(command, *args)
       # Crossdoc sends raw strings to execute...
-      command_template = CommandTemplate.new(command_template, {}, *args) if command_template.is_a? String
-      fail ArgumentError, 'Execute requires a CommandTemplate' unless command_template.is_a? CommandTemplate
-      full_cmd = command_template.command(*args)
+      full_cmd = if command.respond_to? :render
+                   command.render(*args)
+                 else
+                   [command, *args].join(' ')
+                 end
       logger.info("Executing: #{full_cmd}")
       shell.execute(full_cmd, @shell_opts)
     end

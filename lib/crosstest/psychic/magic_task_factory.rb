@@ -54,13 +54,9 @@ module Crosstest
         init_attr(:env) { ENV.to_hash }
       end
 
-      def command_for_task(task_name)
-        tasks[task_name] if tasks.include? task_name
-      end
-
-      def find_task(task_name, *_args)
+      def command_for_task(task_name, *_args)
         task_name = task_name.to_s
-        task = command_for_task(task_name)
+        task = tasks[task_name] if tasks.include? task_name
         task = task.call if task.respond_to? :call
         fail Crosstest::Psychic::TaskNotImplementedError, task_name if task.nil?
         task

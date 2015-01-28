@@ -6,7 +6,7 @@ module Crosstest
       include Crosstest::Core::Logger
       attr_reader :shell
 
-      def execute(command, opts)
+      def execute(command, opts) # rubocop:disable Metrics/AbcSize
         @logger = opts.delete(:logger) || logger
         cwd = opts[:cwd] || Dir.pwd
         env = opts[:env] || {}
