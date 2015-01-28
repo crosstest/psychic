@@ -23,11 +23,11 @@ module Crosstest
         @token_handler ||= Tokens::RegexpTokenHandler.new(source, /'\{(\w+)\}'/, "'\\1'")
       end
 
-      def command(runner)
-        # FIXME: Just runner.command_for_sample(...) ?
-        command = runner.command_for_sample(self)
-        # FIXME: Shouldn't this be relative to runner's cwd?
-        # command ||= Crosstest::Core::FileSystem.relativize(source_file, runner.cwd)
+      def command(psychic)
+        # FIXME: Just psychic.command_for_sample(...) ?
+        command = psychic.command_for_sample(self)
+        # FIXME: Shouldn't this be relative to psychic's cwd?
+        # command ||= Crosstest::Core::FileSystem.relativize(source_file, psychic.cwd)
         # command ||= "./#{source_file}"
         command = command.call if command.respond_to? :call
 

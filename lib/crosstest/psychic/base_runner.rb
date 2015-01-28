@@ -7,7 +7,7 @@ module Crosstest
       include Crosstest::Shell
       include Crosstest::Core::Logger
 
-      attr_reader :known_tasks, :tasks, :cwd, :env, :hints, :priority, :runner
+      attr_reader :known_tasks, :tasks, :cwd, :env, :hints, :priority, :psychic
 
       module ClassMethods
         def register_task_factory
@@ -49,8 +49,8 @@ module Crosstest
         base.extend(ClassMethods)
       end
 
-      def initialize(runner, opts = {}) # rubocop:disable Metrics/AbcSize
-        @runner = runner
+      def initialize(psychic, opts = {}) # rubocop:disable Metrics/AbcSize
+        @psychic = psychic
         @opts = opts
         @priority = TASK_PRIORITY
         init_attr(:cwd) { Dir.pwd }

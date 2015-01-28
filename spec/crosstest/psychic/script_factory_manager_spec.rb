@@ -3,21 +3,21 @@ require 'spec_helper'
 module Crosstest
   class Psychic
     class FakeRubyFactory < ScriptFactory
-      runs_extension 'fake_rb'
-      runs_extension 'fake_erb'
+      runs 'fake_rb'
+      runs 'fake_erb'
     end
 
     class FakeJavaScriptFactory < ScriptFactory
-      runs_extension 'fake_js'
+      runs 'fake_js'
     end
 
     RSpec.describe ScriptFactoryManager do
-      let(:runner) { instance_double(Psychic) }
+      let(:psychic) { instance_double(Psychic) }
       let(:opts) do
         {}
       end
       let(:subject) do
-        described_class.new runner, opts
+        described_class.new psychic, opts
       end
 
       before(:each) do

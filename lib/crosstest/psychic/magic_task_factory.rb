@@ -5,7 +5,7 @@ module Crosstest
 
       TASK_PRIORITY = 5
 
-      attr_reader :known_tasks, :tasks, :cwd, :env, :hints, :priority, :runner
+      attr_reader :known_tasks, :tasks, :cwd, :env, :hints, :priority, :psychic
 
       class << self
         def register_task_factory
@@ -43,8 +43,8 @@ module Crosstest
         end
       end
 
-      def initialize(runner, opts = {})
-        @runner = runner
+      def initialize(psychic, opts = {})
+        @psychic =psychic
         @opts = opts
         @priority = self.class::TASK_PRIORITY
         init_attr(:cwd) { Dir.pwd }

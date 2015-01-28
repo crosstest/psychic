@@ -32,7 +32,7 @@ module Crosstest
         protected
 
         def bundler_active?
-          task_runner.task_factory_manager.active? BundlerTaskFactory
+          psychic.task_factory_manager.active? BundlerTaskFactory
         end
       end
     end

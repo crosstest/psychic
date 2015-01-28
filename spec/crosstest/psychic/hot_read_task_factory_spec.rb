@@ -14,9 +14,9 @@ module Crosstest
             'tasks' => task_map
           )
         end
-        let(:runner) { double('runner', hints: hints) }
+        let(:psychic) { double('psychic', hints: hints) }
         let(:shell) { Crosstest::Shell.shell = double('shell') }
-        subject { described_class.new(runner, cwd: current_dir) }
+        subject { described_class.new(psychic, cwd: current_dir) }
 
         describe 'known_task?' do
           it 'returns true for task ids' do

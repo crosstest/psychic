@@ -7,8 +7,8 @@ module Crosstest
   class Psychic
     class BaseCLI < Crosstest::Core::CLI
       no_commands do
-        def runner
-          @runner ||= setup_runner
+        def psychic
+          @psychic ||= setup_runner
         end
 
         def setup_runner
@@ -29,7 +29,7 @@ module Crosstest
       method_option :print, aliases: '-p', desc: 'Print the command (or script) instead of running it'
       def task(task_name = nil)
         abort 'You must specify a task name, run `psychic list tasks` for a list of known tasks' unless task_name
-        command_template = runner.command_for_task(task_name)
+        command_template = psychic.command_for_task(task_name)
         abort "No usable command was found for task #{task_name}" if command_template.nil?
         if options[:print]
           say command_template.command({}, *extra_args)
@@ -43,23 +43,23 @@ module Crosstest
 
       no_commands do
         def print_task(task_name, *args)
-          task = runner.find_task(task_name)
+          task = psychic.find_task(task_name)
           say "#{task.command} #{args.join ' '}\n"
         end
 
         def execute_task(task_name, *args)
-          result = runner.execute_task(task_name, *args)
+          result = psychic.execute_task(task_name, *args)
           result.error!
           say_status :success, task_name
         end
 
         def print_sample(sample_name, *args)
-          sample = runner.find_script(sample_name)
-          say runner.command_for_sample(sample, *args)
+          sample = psychic.find_script(sample_name)
+          say psychic.command_for_sample(sample, *args)
         end
 
         def execute_sample(sample_name, *args)
-          result = runner.run_sample(sample_name, *args)
+          result = psychic.run_sample(sample_name, *args)
           result.error!
           say_status :success, sample_name
         end
@@ -96,7 +96,7 @@ module Crosstest
         method_option :verbose, aliases: '-v', desc: 'Verbose: display more details'
         method_option :cwd, desc: 'Working directory for detecting and running commands'
         def samples
-          samples = runner.known_scripts.map do |sample|
+          samples = psychic.known_scripts.map do |sample|
             [set_color(sample.name, :bold), sample.source_file]
           end
           print_table samples
@@ -106,10 +106,10 @@ module Crosstest
         method_option :verbose, aliases: '-v', desc: 'Verbose: display more details'
         method_option :cwd, desc: 'Working directory for detecting and running commands'
         def tasks # rubocop:disable Metrics/AbcSize
-          runner.known_tasks.map do |task|
+          psychic.known_tasks.map do |task|
             task_id = set_color(task, :bold)
             if options[:verbose]
-              details = runner.command_for_task(task)
+              details = psychic.command_for_task(task)
               details = "\n#{details}".lines.join('  ') if details.lines.size > 1
               say "#{task_id}: #{details}"
             else
@@ -124,7 +124,7 @@ module Crosstest
         method_option :verbose, aliases: '-v', desc: 'Verbose: display more details'
         method_option :cwd, desc: 'Working directory for detecting and running commands'
         def sample(sample_name)
-          sample = runner.find_script(sample_name)
+          sample = psychic.find_script(sample_name)
           say sample.to_s(options[:verbose])
         end
       end

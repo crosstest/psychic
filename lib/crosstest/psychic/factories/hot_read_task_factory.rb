@@ -5,9 +5,9 @@ module Crosstest
         include BaseRunner
         register_task_factory
 
-        def initialize(runner, opts = {})
+        def initialize(psychic, opts = {})
           super
-          @tasks = runner.hints.tasks
+          @tasks = psychic.hints.tasks
           @known_tasks = @tasks.keys
         end
 
@@ -25,7 +25,7 @@ module Crosstest
         register_script_factory
 
         def sample_hints
-          task_runner.hints.samples
+          psychic.hints.samples
         end
 
         def known_script?(script)
@@ -33,10 +33,10 @@ module Crosstest
         end
 
         def hot_task_factory
-          task_runner.task_factory_manager.active? HotReadTaskFactory
+          psychic.task_factory_manager.active? HotReadTaskFactory
         end
 
-        def can_run_sample?(code_sample)
+        def priority_for_script(code_sample)
           if known_script? code_sample
             9
           elsif hot_task_factory.known_task? :run_sample

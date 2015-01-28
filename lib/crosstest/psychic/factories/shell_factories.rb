@@ -5,13 +5,13 @@ module Crosstest
         EXTENSIONS = ['.sh', '']
 
         def active?
-          true unless runner.os_family == :windows
+          true unless psychic.os_family == :windows
         end
 
         protected
 
         def relativize_cmd(cmd)
-          cmd = Crosstest::Core::FileSystem.relativize(cmd, @cwd)
+          cmd = Crosstest::Core::FileSystem.relativize(cmd, psychic.cwd)
           "./#{cmd}" unless cmd.to_s.start_with? '/'
         end
       end
