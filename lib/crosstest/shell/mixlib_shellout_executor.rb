@@ -33,7 +33,8 @@ module Crosstest
         end
       end.compact
 
-      def execute(command, opts)
+      def execute(command, opts) # rubocop:disable Metrics/AbcSize
+        opts[:cwd] = (opts[:cwd] || Dir.pwd).to_s
         @logger = opts.delete(:logger) || logger
         @shell = Mixlib::ShellOut.new(command, opts)
         @shell.live_stream = IOToLog.new(@logger)
