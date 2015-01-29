@@ -34,7 +34,8 @@ module Crosstest
     include Shell
     include TaskRunner
     include ScriptRunner
-    attr_reader :cwd, :env, :os, :hints, :parameters, :opts
+    attr_reader :name, :cwd, :env, :os, :hints, :parameters, :opts
+    alias_method :basedir, :cwd
 
     DEFAULT_PARAMS_FILE = 'psychic-parameters.yaml'
 
@@ -45,6 +46,7 @@ module Crosstest
       opts[:cwd] = Pathname(opts[:cwd]).to_s
       @opts = opts
       init_attr(:cwd) { Dir.pwd }
+      init_attr(:name) { File.basename cwd }
       init_hints
       init_attr(:logger) { new_logger }
       init_attr(:env) { ENV.to_hash }
