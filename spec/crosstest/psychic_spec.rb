@@ -35,7 +35,7 @@ module Crosstest
             cmd = 'echo'
           end
           execution_result = subject.execute(cmd, 'hi')
-          expect(execution_result.stdout).to match(/\Ahi\Z/)
+          expect(execution_result.stdout.strip).to eq('hi')
         end
       end
     end

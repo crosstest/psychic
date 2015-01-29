@@ -2,6 +2,10 @@ module Crosstest
   RSpec.describe Shell do
     subject { described_class.shell }
 
+    let(:is_windows?) do
+      RbConfig::CONFIG['host_os'] =~ /mswin|msys|mingw|cygwin|bccwin|wince|emc/
+    end
+
     describe '.shell' do
       it 'returns an appropriate shell for the platform' do
         if RUBY_PLATFORM == 'java'
@@ -17,15 +21,17 @@ module Crosstest
         execution_result = subject.execute("echo 'hi'", {})
         expect(execution_result).to be_an_instance_of Shell::ExecutionResult
         expect(execution_result.command).to eq("echo 'hi'")
-        expect(execution_result.stdout).to match(/\Ahi\Z/)
+        expect(execution_result.stdout.strip).to eq('hi')
         expect(execution_result.exitstatus).to eq(0)
         expect(execution_result).to be_successful
         expect { execution_result.error! }.to_not raise_error
       end
 
-      it 'raises an ExecutionError immediately if the command was not found' do
+      it 'raises an ExecutionError if the command was not found' do
         execution_error = begin
           subject.execute('missing', {})
+          # Raised immediately by MixLib on Linux, but not by Buff or on Windows
+          execution_result.error!
         rescue => e
           e
         end
@@ -49,8 +55,9 @@ module Crosstest
           current_ruby_dir = Pathname(Dir.pwd).expand_path
           current_aruba_dir = Pathname(current_dir).expand_path
           expect(current_ruby_dir).to_not eq(current_aruba_dir)
-          execution_result_without_cwd = subject.execute('pwd', {})
-          execution_result_with_cwd = subject.execute('pwd', cwd: current_aruba_dir)
+          pwd_cmd = is_windows? ? 'echo %cd%' : 'pwd'
+          execution_result_without_cwd = subject.execute(pwd_cmd, {})
+          execution_result_with_cwd = subject.execute(pwd_cmd, cwd: current_aruba_dir)
           expect(execution_result_without_cwd.stdout.strip).to eq(current_ruby_dir.to_s)
           expect(execution_result_with_cwd.stdout.strip).to eq(current_aruba_dir.to_s)
         end
