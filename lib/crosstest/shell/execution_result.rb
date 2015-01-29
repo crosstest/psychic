@@ -29,7 +29,7 @@ module Crosstest
 
       def error!
         unless successful?
-          error = ExecutionError.new
+          error = ExecutionError.new "#{command} returned exit code #{exitstatus}"
           error.execution_result = self
           fail error
         end
