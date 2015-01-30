@@ -30,10 +30,10 @@ module Crosstest
           end
         end
 
-        describe '#command_for_task' do
+        describe '#task' do
           context 'matching a task' do
             it 'builds the task command' do
-              expect(subject.command_for_task(:bootstrap)).to eq('foo')
+              expect(subject.task(:bootstrap)).to eq('foo')
             end
 
             pending 'test priority when multiple factories implement run_script'

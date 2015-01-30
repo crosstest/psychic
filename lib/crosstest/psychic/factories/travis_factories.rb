@@ -7,7 +7,11 @@ module Crosstest
         register_task_factory
 
         def active?
-          super && travis_build_installed?
+          super && travis_allowed? && travis_build_installed?
+        end
+
+        def travis_allowed?
+          psychic.opts[:travis]
         end
 
         def travis_build_installed?

@@ -13,7 +13,10 @@ module Crosstest
 
       def priority_for(script)
         active_factories.map do | factory |
-          factory.priority_for_script(script) || 0
+          priority = factory.priority_for_script(script) || 0
+          # FIXME: Need to change default log level to info before adding debug logging
+          # logger.debug("#{factory.class} priority for #{script.source_file}: #{priority}")
+          priority
         end.max
       end
     end

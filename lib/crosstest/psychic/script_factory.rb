@@ -58,7 +58,7 @@ module Crosstest
         self.class.priority_for_script(script)
       end
 
-      def command_for_script(_script)
+      def script(_script)
         fail NotImplementedError, 'This should be implemented by subclasses'
       end
     end

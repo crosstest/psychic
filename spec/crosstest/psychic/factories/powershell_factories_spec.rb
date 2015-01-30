@@ -33,12 +33,12 @@ module Crosstest
           end
         end
 
-        describe '#command_for_task' do
+        describe '#task' do
           context 'matching a task' do
             context 'with scripts/*.ps1 files' do
               include_context 'with scripts/*.ps1 files' do
                 it 'returns the script command' do
-                  expect(subject.command_for_task :bootstrap).to eq(
+                  expect(subject.task :bootstrap).to eq(
                     'PowerShell -NoProfile -ExecutionPolicy Bypass -File "scripts/bootstrap.ps1"'
                   )
                 end
@@ -49,7 +49,7 @@ module Crosstest
           context 'not matching a task' do
             it 'raises an error' do
               # Use foo to ensure it doesn't match ps1 or hidden (. prefixed) files
-              expect(subject.command_for_task :foo).to be nil
+              expect(subject.task :foo).to be nil
             end
           end
         end

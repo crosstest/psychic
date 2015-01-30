@@ -14,7 +14,7 @@ module Crosstest
           end
         end
 
-        def command_for_task(task_alias)
+        def task(task_alias)
           task = task_alias.to_s
           script = Dir["#{cwd}/scripts/#{task}{.ps1}"].first
           relativize_cmd(script) if script
@@ -39,7 +39,7 @@ module Crosstest
           true if psychic.os_family == :windows
         end
 
-        def command_for_script(script)
+        def script(script)
           script = psychic.task('run_script')
           if script
             "#{script} #{script.source_file}"

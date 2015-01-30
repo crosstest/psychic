@@ -29,7 +29,7 @@ module Crosstest
           end
         end
 
-        def command_for_task(task_alias)
+        def task(task_alias)
           task = task_alias.to_s
           script = Dir.glob("#{cwd}/scripts/#{task}{.sh,}", File::FNM_CASEFOLD).first
           relativize_cmd(script) if script
@@ -58,7 +58,7 @@ module Crosstest
           end
         end
 
-        def command_for_script(script)
+        def script(script)
           base_command = run_script_command
           if base_command
             "#{base_command} #{script.source_file}"

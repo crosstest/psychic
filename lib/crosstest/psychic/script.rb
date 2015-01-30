@@ -73,7 +73,7 @@ module Crosstest
           template = File.read(absolute_source_file)
           # Default token pattern/replacement (used by php-opencloud) should be configurable
           token_handler = Tokens::RegexpTokenHandler.new(template, /'\{(\w+)\}'/, "'\\1'")
-          confirm_or_update_parameters(token_handler.tokens)
+          confirm_or_update_parameters(token_handler.tokens, parameters)
           File.write(absolute_source_file, token_handler.render(parameters))
         end
       end
@@ -86,7 +86,7 @@ module Crosstest
         script_factory = psychic.script_factory_manager.factories_for(self).last
         fail Crosstest::Psychic::ScriptNotRunnable, script if script_factory.nil?
 
-        @command = script_factory.command_for_script(self)
+        @command = script_factory.script(self)
         @command = @command.call if @command.respond_to? :call
         @command
       end
@@ -129,26 +129,27 @@ module Crosstest
       end
 
       def should_restore?(file, orig, timing = :before)
-        return true if [timing, 'always']. include? @restore_mode
+        return true if [timing, 'always']. include? opts[:restore_mode]
         if interactive?
-          @cli.yes? "Would you like to #{file} to #{orig} before running the script?"
+          cli.yes? "Would you like to #{file} to #{orig} before running the script?"
         end
       end
 
       def prompt(key)
-        value = @parameters[key]
+        params = psychic.parameters
+        value = params[key]
         if value
-          return value unless @interactive_mode == 'always'
-          new_value = @cli.ask "Please set a value for #{key} (or enter to confirm #{value.inspect}): "
+          return value unless  opts[:interactive] == 'always'
+          new_value = cli.ask "Please set a value for #{key} (or enter to confirm #{value.inspect}): "
           new_value.empty? ? value : new_value
         else
-          @cli.ask "Please set a value for #{key}: "
+          cli.ask "Please set a value for #{key}: "
         end
       end
 
-      def confirm_or_update_parameters(required_parameters)
+      def confirm_or_update_parameters(required_parameters, params)
         required_parameters.each do | key |
-          @parameters[key] = prompt(key)
+          params[key] = prompt(key)
         end if interactive?
       end
     end

@@ -12,10 +12,48 @@ module Crosstest
         end
 
         def setup_runner
-          runner_opts = { cli: shell, parameters: options.parameters }
+          runner_opts = { cwd: Dir.pwd, cli: shell, parameters: options.parameters }
           runner_opts.merge!(Crosstest::Core::Util.symbolized_hash(options))
-          Crosstest::Psychic.new(Dir.pwd, runner_opts)
+          Crosstest::Psychic.new(runner_opts)
         end
+      end
+    end
+
+    class List < BaseCLI
+      desc 'scripts', 'Lists known scripts'
+      method_option :verbose, aliases: '-v', desc: 'Verbose: display more details'
+      method_option :cwd, desc: 'Working directory for detecting and running commands'
+      def scripts
+        scripts = psychic.known_scripts.map do |script|
+          [set_color(script.name, :bold), script.source_file]
+        end
+        print_table scripts
+      end
+
+      desc 'tasks', 'List known tasks'
+      method_option :verbose, aliases: '-v', desc: 'Verbose: display more details'
+      method_option :cwd, desc: 'Working directory for detecting and running commands'
+      def tasks # rubocop:disable Metrics/AbcSize
+        psychic.known_tasks.map do |task|
+          task_id = set_color(task, :bold)
+          if options[:verbose]
+            details = psychic.task(task)
+            details = "\n#{details}".lines.join('  ') if details.lines.size > 1
+            say "#{task_id}: #{details}"
+          else
+            say task_id
+          end
+        end
+      end
+    end
+
+    class Show < BaseCLI
+      desc 'script <name>', 'Show detailed information about a script'
+      method_option :verbose, aliases: '-v', desc: 'Verbose: display more details'
+      method_option :cwd, desc: 'Working directory for detecting and running commands'
+      def script(script_name)
+        script = psychic.script(script_name)
+        say script.to_s(options[:verbose])
       end
     end
 
@@ -26,14 +64,15 @@ module Crosstest
       method_option :verbose, aliases: '-v', desc: 'Verbose: display more details'
       method_option :cwd, desc: 'Working directory for detecting and running commands'
       method_option :os, desc: "Target OS (default value is `RbConfig::CONFIG['host_os']`)"
+      method_option :travis, type: :boolean, desc: "Enable/disable delegation to travis-build, if it's available"
       method_option :print, aliases: '-p', desc: 'Print the command (or script) instead of running it'
       def task(task_alias = nil) # rubocop:disable Metrics/AbcSize
         abort 'You must specify a task name, run `psychic list tasks` for a list of known tasks' unless task_alias
-        command = psychic.task(task_alias, *extra_args)
+        command = psychic.task(task_alias)
         if options[:print]
           say command
         else
-          psychic.execute command
+          psychic.execute(command, *extra_args)
         end
       rescue TaskNotImplementedError => e
         abort "No usable command was found for task #{task_alias}"
@@ -61,55 +100,17 @@ module Crosstest
       method_option :print, aliases: '-p', desc: 'Print the command (or script) instead of running it', lazy_default: true
       def script(script_name = nil) # rubocop:disable Metrics/AbcSize
         abort 'You must specify a script name, run `psychic list scripts` for a list of known scripts' unless script_name
-        command = psychic.command_for_script(script_name, *extra_args)
+        command = psychic.script(script_name, *extra_args)
         if options[:print]
-          say command
+          say command.command(*extra_args) << "\n"
         else
-          psychic.execute command
+          command.execute(*extra_args)
         end
       rescue ScriptNotRunnable => e
         abort "No usable command was found for task #{task_alias}"
       rescue Crosstest::Shell::ExecutionError => e
         say_status :failed, task_alias, :red
         say e.execution_result if e.execution_result
-      end
-
-      class List < BaseCLI
-        desc 'scripts', 'Lists known scripts'
-        method_option :verbose, aliases: '-v', desc: 'Verbose: display more details'
-        method_option :cwd, desc: 'Working directory for detecting and running commands'
-        def scripts
-          scripts = psychic.known_scripts.map do |script|
-            [set_color(script.name, :bold), script.source_file]
-          end
-          print_table scripts
-        end
-
-        desc 'tasks', 'List known tasks'
-        method_option :verbose, aliases: '-v', desc: 'Verbose: display more details'
-        method_option :cwd, desc: 'Working directory for detecting and running commands'
-        def tasks # rubocop:disable Metrics/AbcSize
-          psychic.known_tasks.map do |task|
-            task_id = set_color(task, :bold)
-            if options[:verbose]
-              details = psychic.task(task)
-              details = "\n#{details}".lines.join('  ') if details.lines.size > 1
-              say "#{task_id}: #{details}"
-            else
-              say task_id
-            end
-          end
-        end
-      end
-
-      class Show < BaseCLI
-        desc 'script <name>', 'Show detailed information about a script'
-        method_option :verbose, aliases: '-v', desc: 'Verbose: display more details'
-        method_option :cwd, desc: 'Working directory for detecting and running commands'
-        def script(script_name)
-          script = psychic.script(script_name)
-          say script.to_s(options[:verbose])
-        end
       end
 
       desc 'list', 'List known tasks or scripts'

@@ -53,7 +53,7 @@ module Crosstest
         init_attr(:tasks) { self.class.tasks }
       end
 
-      def command_for_task(task_alias, *_args)
+      def task(task_alias, *_args)
         task_alias = task_alias.to_s
         task = tasks[task_alias] if tasks.include? task_alias
         task = task.call if task.respond_to? :call

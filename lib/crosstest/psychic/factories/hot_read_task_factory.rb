@@ -14,7 +14,7 @@ module Crosstest
           !@tasks.empty?
         end
 
-        def command_for_task(task_alias)
+        def task(task_alias)
           return @tasks[task_alias.to_s] if @tasks.include? task_alias.to_s
           super
         end
@@ -45,8 +45,8 @@ module Crosstest
           end
         end
 
-        def command_for_script(script)
-          script_hints[script] || hot_task_factory.command_for_task(:run_script)
+        def script(script)
+          script_hints[script] || hot_task_factory.task(:run_script)
         end
       end
     end

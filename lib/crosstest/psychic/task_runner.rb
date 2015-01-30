@@ -7,7 +7,7 @@ module Crosstest
       def task(task_alias)
         task_factory = task_factory_manager.factories_for(task_alias).last
         fail TaskNotImplementedError, task_alias if task_factory.nil? || task_factory.priority == 0
-        command = task_factory.command_for_task(task_alias)
+        command = task_factory.task(task_alias)
         Task.new(self, command)
       end
 
