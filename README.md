@@ -1,128 +1,228 @@
-# Psychic::Runner
+# Psychic
 
-Psychic runs anything.
+Psychic is a universal aliasing system for tasks and scripts. It provides a command-line tool to give humans easy-to-remember aliases for running tasks, and a API to give machines a standard way to interact with tasks and scripts across many projects.
 
-## What is Psychic
+It is part of the [Crosstest](https://github.com/crosstest/crosstest) suite of tools.
 
-Psychic is a project to help developers that work on many different projects. It
-provides a unified interface for running tasks so you don't need to remember a
-bunch of project specific commands.
+## Warning
 
-Psychic provides command aliases so that a command like `psychic bootstrap`
-will invoke a similiar task in any project, but the actual command invoked will vary.
-It might end up calling `bundle install`, `npm install` `./scripts/boostrap.sh` or some
-other command.
+Psychic is still pre-1.0 software that has **no** backwards compatibility guarantees until
+the 1.0 release occurs!
 
-Psychic provides a common set of alises for common tasks but also allows you to define
-custom tasks across different projects, so you could have cross-project commands like
-`metrics` or `documentation`.
+## Installation
 
-## Why?
+Psychic is installed as a gem. It's recommended that you install it with bunder. Add this to
+you Gemfile:
 
-Psychic exists to provide a common interface for tasks to build, test, and analyze projects while still allowing (or even encouraging) projects to use idiomatic patterns for their particular language. This makes it easy for new contributors to join a project because it follows the "principal of least astonishment", while also providing a consistent interface for tools to build, test or analyze any project.
+```ruby
+gem 'crosstest-psychic'
+```
 
-The [bootstrap consistency pattern](http://wynnnetherland.com/linked/2013012801/bootstrapping-consistency) is an example of that. It aims to provide "a consistent user experience to get from zero to productive on any new project". Similarly, Travis-CI gives you a consistent interface to test any software project. The command `travis run` will always build and test a project.
+And run `bundle install`.
 
-Crosstest is an attempt to make a more generic framework for creating consistent user experiences across projects. That experienec can be "getting from zero to productive" like the bootstrap consistency pattern, "testing a change" like Travis-CI, or even something like "generating end of sprint reports" or "generating and previewing documentation".
+## Detection and Hints
 
-In fact, the reason the project is called "psychic" is because it's supposed to seem like it's reading your mind. When you ask it to do something, like "bootstrap" a project, it should seem like it just magically picks the correct command to run. The project is actually more of a fraud than a clairvoyant - it just uses "[hot](http://en.wikipedia.org/wiki/Hot_reading)" and "[cold](http://en.wikipedia.org/wiki/Cold_reading)" reading tricks to pick the correct command.
+Psychic itself is not a tool for implementing tasks, it's just a tool for detecting and aliasing
+tasks and scripts that are handled by other tools. This is useful if you're dealing with a set of
+projects and want to be able to use the same command alises for similar tasks, even if the actual
+command to run the task differs.
 
-### Psychic vs scripts/*
+This is similar to the approach taken by many CI systems, which map commands to stages of a lifecycle
+and attempt to automatically detect appropriate commands if they are not explicitly mapped. The
+[travis-build](https://github.com/travis-ci/travis-build) project is an example of this. It gives you
+commands like `travis run install`, which will run the install commands for the project. Those commands
+may be specified in your `travis.yml`, but if they aren't than it will examine your project and attempt
+to choose an appropriate install command.
+
+Psychic is similar. It will first look in `psychic.yaml` to see if you have explicitly mapped an alias to a command, and then it will look examine your project and attempt to infer an appropriate command. What makes Psychic different than travis-build is that it's designed as a more generic, standalone tool and API. It aims to detect and use the same idiomatic tools as Travis, but it is easier to install and use, does not perform optimizations that are appropriate on CI servers but may surprise developers, and offers some features that are useful in development environments but not on CI servers (like the `--interactive` mode).
+
+## API
+
+Psychic has a simple API. You simply create a Psychic instance and then ask it for tasks or scripts:
+
+```ruby
+psychic = Crosstest::Psychic.new
+
+# Find and execute the bootstrap task
+psychic.task('bootstrap').execute
+
+# Find a runner and execute a specific script
+# Psychic will figure out if it needs to do things
+# like run `bundle exec` or `javac`.
+psychic.script('samples/quine.rb').execute
+
+# You can also find scripts by alias or by loosely matching
+# the name.
+psychic.script('hello world').source_file
+# => 'src/main/java/HelloWorld.java'
+```
+
+See the full [API Documentation](http://www.rubydoc.info/github/crosstest/psychic) for more.
+
+## CLI Usage
+
+It's easy to list the available commands:
+
+```
+$ bundle exec psychic help
+Scripts commands:
+  psychic bootstrap       # Executes the bootstrap task
+  psychic help [COMMAND]  # Describe available commands or one specific command
+  psychic list            # List known tasks or scripts
+  psychic script <name>   # Executes a script
+  psychic show            # Show details about a task or script
+  psychic task <name>     # Executes any task by name
+```
+
+### Tasks
+
+It's easy to print or run a task:
+
+```
+$ bundle exec psychic bootstrap --print
+bundle install
+
+$ bundle exec psychic bootstrap
+I, [2015-01-30T14:28:06.940072 #39505]  INFO -- :        Executing: bundle install
+I, [2015-01-30T14:28:07.745404 #39505]  INFO -- :        Resolving dependencies...
+I, [2015-01-30T14:28:07.749574 #39505]  INFO -- :        Using ast 2.0.0
+I, [2015-01-30T14:28:07.749677 #39505]  INFO -- :        Using parser 2.2.0.2
+I, [2015-01-30T14:28:07.749709 #39505]  INFO -- :        Using astrolabe 1.3.0
+...
+I, [2015-01-30T14:28:07.939301 #39505]  INFO -- :        Your bundle is complete!
+I, [2015-01-30T14:28:07.939427 #39505]  INFO -- :        Use `bundle show [gemname]` to see where a bundled gem is installed.
+```
+
+#### Custom tasks
+
+There are built-in aliases that correspond to common commands in a CI lifecycle, like `bootstrap` above. Psychic will usually find an appropriate command for these tasks in any project.
+
+Psychic can also custom tasks that are not part of the default CI lifecycle and may not even exist in all projects. This could be anything from a fairly common name like `lint`, to something like `generate_report_for_my_boss`.
+
+You can run these with the `psychic task <name>` command:
+```
+~/ruby $ bundle exec psychic task lint --print
+bundle exec rubocop -D
+
+~/java $ bundle exec psychic task lint --print
+gradle checkstyleMain
+
+~/python $ bundle exec psychic task lint --print
+./scripts/lint.sh
+```
+
+#### travis-build integration
+
+Psychic can delegate tasks that correspond to the travis lifecycle to travis-build if it is installed. This isn't enabled by default, because the travis-build uses optimizations for running on CI servers that could cause confusion in developer environments, like using sticky bundler flags like `--deployment`.
+
+If you the working directory contains a .travis.yml file and you have travis-build installed you can delegate to it with the `--travis` option:
+
+```
+$ bundle exec psychic task bootstrap --print --travis
+travis run --skip-version-check install
+```
+
+#### scripts/* integraiton
 
 ThoughtBot, GitHub and others use a [bootstrap consistency pattern](http://wynnnetherland.com/linked/2013012801/bootstrapping-consistency) to provide "a consistent user experience to get from zero to productive on any new project". The scripts used vary but common examples are:
 - Bootstrapping via `bin/setup` or `script/bootstrap`
 - Running tests via `script/test` and/or `script/cibuild`
 
-Psychic's goals are similar but it's scope is broader, as explained above. Psychic will detect the scripts/* pattern and delegate task commands to it, so `psychic task bootstrap` will run `scripts/bootstrap.sh` if it exists. If you have both `bootstrap.sh` and `boostrap.ps1` (for Windows) psychic will choose the appropriate script for your platform.
+Psychic has built-in support for these patterns, and will automatically map anything in scripts/* to a task alias. It will also select a platform appropriate script, like `bootstrap.sh` for Linux and `bootstrap.ps` for Windows.
 
-The difference is that if you try to run a task for psychic that doesn't have a script Psychic will continue looking for other ways to run that task. For example, if you have a `scripts/bootstrap.sh` and `Rakefile` that defines `lint` task, then `psychic bootstrap` will run `scripts/bootstrap.sh`, while `psychic lint` will run `rake lint`.
+### Scripts
 
-### Psychic vs Travis-Build
+Psychic also supports running scripts, including ones that require input. You just use the `script` command, along with either the path to a script, or an alias for a script. This is useful for running code samples that are implemented in multiple languages:
 
-The goals of psychic are also similar to travis-build, and psychic will delegate supported tasks to travis-build if it is installed. Even if it isn't installed, Psychic aims to be as compatible as possible with travis-build, so a command like `psychic task install` behave a lot like `travis run install`.
+```
+~/java $ bundle exec psychic script src/main/java/HelloWorld.java
+I, [2015-01-30T15:01:44.417646 #42722]  INFO -- :        Executing: ./scripts/run_script.sh src/main/java/HelloWorld.java
+I, [2015-01-30T15:01:53.231440 #42722]  INFO -- :        Hello, world!
 
-Note that travis-build is not installed as a normal gem or Psychic would just depend on it. If you want psychic to delegate to travis-build you need to [install it as a CLI extension](https://github.com/travis-ci/travis-build#use-as-addon-for-cli).
+~/java $ bundle exec psychic script "hello world"
+I, [2015-01-30T15:00:32.099182 #42637]  INFO -- :        Executing: ./scripts/run_script.sh src/main/java/HelloWorld.java
+I, [2015-01-30T15:00:43.497285 #42637]  INFO -- :        Hello, world!
 
-#### Scope
-Psychic's scope is broader, so there are things you could do with psychic that wouldn't make sense to run on Travis-CI. For example, you could setup a command like `psychic wip`, that would show your work in progress for any given project. The behavior would be project specific, but could include things like:
-- Listing your local branches that haven't been merged
-- Listing pull requests that are assigned to you
-- Issues that are assigned to you
-- Display `what_im_working_on.txt`
-
-The command could be setup so it would display a WIP report for any project, even if some projects are getting info from your local git branches, other from GitHub, and others from issue trackers like JIRA, Launchpad, or Mingle. This command obviously doesn't make sense on Travis-CI, especially if it's only showing the work in progress for a current developer, but could be very useful if you want to quickly review your WIP across several projects. That's what the [crosstest](https://github.com/crosstest/crosstest) tool's [crosstasking](https://github.com/crosstest/crosstest#crosstasking-via-psychic) feature is designed to do.
-
-#### Features
-
-This is one of the reasons why psychic was created as a new project rather than as enhancements to travis-build. In general, Psychic aims to provide a simpler API that is less coupled with Travis. The major differences between Psychic and travis-build are:
-- Psychic is distributed as a gem that can be used as a library or a standalone CLI. Travis-build is a
-travis CLI extension that is not distributed as a gem.
-- Psychic as a simple API for running tasks by alias. The travis-build API is tightly coupled with a travis-configuration object.
-- Psychic just provides task aliases and inference. It does not provide environment setup, like fetching projects from version control or driving environment managers like rvm or virtualenv. Those actions should be done before invoking psychic.
-- Psychic does not contain travis-specific features like integration with travis's caching system.
-
-## Psychic Commands
-
-### Tasks
-
-Psychic supports both built-in and custom tasks. You should be able to use built-in tasks in virtually any project, even projects that weren't setup for psychic, because these tasks are mapped to common actions of commonly used tools.
-
-#### Built-in Tasks
-
-The `bootstrap` task is an example of a built-in task. If you run `psychic bootstrap` it will setup your project. It detects tools or patterns that are commonly used to setup projects and will choose an appropriate command for that tool. So it may run something like `bundle install`, `npm install`, or `scripts/bootstrap.sh`, depending on your project.
-
-The built-in tasks are all mapped to top-level commands, so you can see them by running `psychic help`.
-
-#### Custom Tasks
-
-Psychic can also run custom tasks. You can list all known tasks, including custom tasks, with the command `psychic list tasks`. If you run with the `--verbose` flag it will show the command that would be run.
-
-This list will include any custom tasks mapped to a command in `psychic.yaml`. Psychic will also try to detect known tasks from any tool that can print out a list of documented tasks, like Rake (via `rake --tasks` ), Grunt (via `grunt --help`) or NPM (via `npm run`). This is only partially supported, because not all tools support listing tasks, and even the ones that do rarely have an option for machine-readable output or an option like git's `--porcelain` (to "give the output in an easy-to-parse format for scripts", which will "remain stable across versions regardless of user configuration").
-
-You can run a custom task via `psychic task <task_name>`. So if you have defined a `lint` task in a tool that supports autodetection, or defined the task in `psychic.yaml`, then you can run it with `psychic task lint`.
-
-```sh
- bundle exec psychic task lint
-I, [2015-01-15T13:01:09.752242 #59850]  INFO -- : Executing bundle exec rubocop -D
-I, [2015-01-15T13:01:10.595926 #59850]  INFO -- : warning: parser/current is loading parser/ruby21, which recognizes
-I, [2015-01-15T13:01:10.596019 #59850]  INFO -- : warning: 2.1.5-compliant syntax, but you are running 2.1.4.
-I, [2015-01-15T13:01:11.142419 #59850]  INFO -- : Inspecting 2 files
-I, [2015-01-15T13:01:11.142526 #59850]  INFO -- : ..
-I, [2015-01-15T13:01:11.142553 #59850]  INFO -- :
-I, [2015-01-15T13:01:11.142576 #59850]  INFO -- : 2 files inspected, no offenses detected
+~/ruby $ bundle exec psychic script "hello world"
+I, [2015-01-30T14:59:40.349071 #42524]  INFO -- :        Executing: bundle exec ruby katas/hello_world.rb
+I, [2015-01-30T14:59:42.750909 #42524]  INFO -- :        Hello, world!
 ```
 
-You can also pass additional arguments to the command after the end of options delimiter (`--`). This is useful for passing flags like `--debug`, `--verbose` or `--help`, though there is no guarantee that any of these flags will work (even `--help`) will work for a task.
+#### Input
 
-```sh
-$ bundle exec psychic task lint -- --debug
-I, [2015-01-15T13:06:11.456547 #60908]  INFO -- : Executing bundle exec rubocop -D --debug
-I, [2015-01-15T13:06:12.288424 #60908]  INFO -- : warning: parser/current is loading parser/ruby21, which recognizes
-I, [2015-01-15T13:06:12.289181 #60908]  INFO -- : warning: 2.1.5-compliant syntax, but you are running 2.1.4.
-I, [2015-01-15T13:06:12.689274 #60908]  INFO -- : For /Users/Thoughtworker/repos/rackspace/polytrix/samples/sdks/ruby: configuration from /Users/Thoughtworker/repos/rackspace/polytrix/.rubocop.yml
-I, [2015-01-15T13:06:12.689343 #60908]  INFO -- : Inheriting configuration from /Users/Thoughtworker/repos/rackspace/polytrix/.rubocop_todo.yml
-I, [2015-01-15T13:06:12.689372 #60908]  INFO -- : Default configuration from /opt/boxen/rbenv/versions/2.1.4/lib/ruby/gems/2.1.0/gems/rubocop-0.28.0/config/default.yml
-I, [2015-01-15T13:06:12.689396 #60908]  INFO -- : Inheriting configuration from /opt/boxen/rbenv/versions/2.1.4/lib/ruby/gems/2.1.0/gems/rubocop-0.28.0/config/enabled.yml
-I, [2015-01-15T13:06:12.689421 #60908]  INFO -- : Inheriting configuration from /opt/boxen/rbenv/versions/2.1.4/lib/ruby/gems/2.1.0/gems/rubocop-0.28.0/config/disabled.yml
-I, [2015-01-15T13:06:12.689447 #60908]  INFO -- : Inspecting 2 files
-I, [2015-01-15T13:06:12.689487 #60908]  INFO -- : Scanning /Users/Thoughtworker/repos/rackspace/polytrix/samples/sdks/ruby/Gemfile
-I, [2015-01-15T13:06:12.689514 #60908]  INFO -- : .Scanning /Users/Thoughtworker/repos/rackspace/polytrix/samples/sdks/ruby/katas/hello_world.rb
-I, [2015-01-15T13:06:12.689534 #60908]  INFO -- : .
-I, [2015-01-15T13:06:12.689553 #60908]  INFO -- :
-I, [2015-01-15T13:06:12.689574 #60908]  INFO -- : 2 files inspected, no offenses detected
-I, [2015-01-15T13:06:12.689595 #60908]  INFO -- : Finished in 0.04216 seconds
+Work in progress! This describes a feature that is still under development. This section describes the plan for handling input, but these strategies are not all implemented yet.
+
+Psychic can bind key/value pairs to input for scripts. There are a few strategies planned for mapping input:
+- Passing them as environment variables
+- Passing them as key-value parameters to the command (e.g. `--foo=bar`)
+- Performing a token-replacement on a script with [Mustache](mustache.github.io) style templates
+- Passing as positional arguments to scripts with a templated command in `psychic.yaml`
+
+The command `psychic show script` will show you what tokens have been detected for a script:
+
+```
+$ bundle exec psychic show script "create server"
+Script Name:                          create server
+Tokens:
+- authUrl
+- username
+- apiKey
+- region
+- serverName
+- imageId
+- flavorId
+Source File:                          Compute/create_server.php
 ```
 
-### Code Samples
+#### Interactive Mode
 
-Psychic also has features to detect and run a code sample by alias, just like it runs tasks by an alias. This gets more complicated and might be split into a separate gem in the future, so we'll leave that for a separate doc.
+You can run scripts interactive mode with the `--interactive` flag. Psychic will prompt you to provide values for input tokens. If you just the use the `--interactive` flag than it will prompt you for values that are not assigned a value. If you use `--interactive=always` then it will ask you to confirm or overwrite existing values as well:
+
+```
+$ bundle exec psychic script "create server" --interactive=always
+Please set a value for authUrl:  http://localhost:5000/
+Please set a value for username (or enter to confirm "my_user"):
+Please set a value for apiKey (or enter to confirm "1234abcd"):
+Please set a value for region (or enter to confirm "ORD"):
+Please set a value for serverName (or enter to confirm "my_server"):
+Please set a value for imageId (or enter to confirm 45678):
+Please set a value for flavorId (or enter to confirm 12345):
+Executing: php Compute/create_server.php
+```
+
+#### Additional command-line arguments and parameters
+
+You can also pass additional arguments to your the task or script that Psychic is going to run. This is generally a bad idea Psychic doesn't standardize the flags so the commands will no longer be portable, but it can be useful for passing simple flags like `--debug` or `--verbose`.
+
+You use the end of options delimiter (` -- `) to mark the end of arguments that should be parsed by Psychic and the beginning of what should be passed, as-is, to the command Psychic invokes:
+
+```
+# Task without additional arguments
+~/ruby $ bundle exec psychic task lint
+I, [2015-01-30T17:21:10.564551 #46122]  INFO -- :        Executing: bundle exec rubocop -D
+
+# Task plus the --help flag
+$ bundle exec psychic task lint -- --help
+I, [2015-01-30T17:24:40.084622 #46319]  INFO -- :        Executing: bundle exec rubocop -D --help
+I, [2015-01-30T17:24:41.035289 #46319]  INFO -- :        warning: parser/current is loading parser/ruby21, which recognizes
+I, [2015-01-30T17:24:41.035395 #46319]  INFO -- :        warning: 2.1.5-compliant syntax, but you are running 2.1.4.
+I, [2015-01-30T17:24:41.359328 #46319]  INFO -- :        Usage: rubocop [options] [file1, file2, ...]
+I, [2015-01-30T17:24:41.359413 #46319]  INFO -- :                --only [COP1,COP2,...]       Run only the given cop(s).
+I, [2015-01-30T17:24:41.359449 #46319]  INFO -- :                --only-guide-cops            Run only cops for rules that link to a
+I, [2015-01-30T17:24:41.359478 #46319]  INFO -- :                                             style guide.
+...
+```
 
 ## Related projects
 
 ### Skeptic
 
-The [Skeptic](https://github.com/crosstest/skeptic) project is a companion to Psychic that tests the results code samples via Psychic. It captures and validates the output the exit code and output of the process, but can also capture additional data through "spies" like looking for HTTP calls it expects to see or files that should be created. So it let's you write assertions and reports on the behavior of code that's executed via Psychic.
+The [Skeptic](https://github.com/crosstest/skeptic) project is a companion to Psychic that tests the uses Psychic's script runner to test sample code. It captures and validates the output the exit code and output of the process, but can also capture additional data through "spies" like looking for HTTP calls it expects to see or files that should be created. So it let's you write assertions and reports on the behavior of code that's executed via Psychic.
 
 ### Crosstest
 
 The [crosstest](https://github.com/crosstest/crosstest) project is for running tasks or tests across multiple projects. It uses Psychic (and Skeptic) in order to run the task in teach project, and then consolidates all of the results and produces reports.
+
+## Contributing
+
+It's easy to add most task runners to Psychic, we just need you to map the commands. See [CONTRIBUTING.md](CONTRIBUTING.md) for more details.
