@@ -7,7 +7,7 @@ module Crosstest
 
       def known_scripts
         @known_scripts ||= hints.scripts.map do | script_name, script_file |
-          Script.new(self, script_name, script_file, self.opts)
+          Script.new(self, script_name, script_file, opts)
         end
       end
 
@@ -28,7 +28,7 @@ module Crosstest
           candidates = files.group_by do | script_file |
             # Chooses the file w/ the highest chance of being runnable
             path = Crosstest::Core::FileSystem.relativize(script_file, cwd)
-            script = Script.new(self, script_name, path, self.opts)
+            script = Script.new(self, script_name, path, opts)
             script_factory_manager.priority_for(script) || 0
           end
           candidates.empty? ? files.first : candidates[candidates.keys.max].min_by(&:length)
@@ -36,7 +36,7 @@ module Crosstest
 
         return nil if file.nil?
 
-        Script.new(self, script_name, file, self.opts).tap do | script |
+        Script.new(self, script_name, file, opts).tap do | script |
           @known_scripts << script
         end
       end
