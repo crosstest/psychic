@@ -56,24 +56,67 @@ module Crosstest
         end
       end
 
-      describe '#execute_task' do
-        it 'captures output' do
-          execution_result = subject.execute_task('foo')
+      describe '#task' do
+        it 'returns a Task' do
+          expect(subject.task('foo')).to be_an_instance_of Psychic::Task
+        end
+
+        it 'has a fluent #execute method' do
+          execution_result = subject.task('foo').execute
           expect(execution_result.stdout).to include('hi')
         end
       end
     end
 
-    context 'running scripts' do
-      describe '#run_script' do
+    context 'finding scripts' do
+      context 'without hints' do
+        describe '#known_scripts' do
+          it 'returns an empty list' do
+            expect(subject.known_scripts).to be_empty
+          end
+        end
+      end
+
+      context 'with hints' do
+        let(:hints) do
+          {
+            scripts: {
+              'foo' => '/path/to/foo.c',
+              'bar' => '/path/to/bar.rb'
+            }
+          }
+        end
+        subject { described_class.new(cwd: Dir.pwd, hints: hints) }
+
+        it 'returns the scripts from the hints' do
+          scripts = subject.known_scripts
+          expect(scripts.size).to eq(2)
+          expect(scripts[0].name).to eq('foo')
+          expect(scripts[0].source_file.to_s).to eq('/path/to/foo.c')
+          expect(scripts[1].name).to eq('bar')
+          expect(scripts[1].source_file.to_s).to eq('/path/to/bar.rb')
+        end
+      end
+
+      describe '#script' do
         before(:each) do
           write_file 'samples/hi.rb', 'puts "hi"'
         end
 
         shared_examples 'executes' do
-          it 'captures output' do
-            execution_result = subject.run_script(script)
+          it 'has a fluent #execute method' do
+            execution_result = subject.script(script).execute
             expect(execution_result.stdout).to include('hi')
+          end
+
+          it 'returns a Script' do
+            expect(subject.script('hi')).to be_an_instance_of Psychic::Script
+          end
+
+          it 'assigns source' do
+            script = subject.script('hi')
+            expect(script.source_file).to eq(Pathname('samples/hi.rb'))
+            expect(script.source).to eq('puts "hi"')
           end
         end
 

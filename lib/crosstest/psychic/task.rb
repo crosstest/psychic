@@ -1,6 +1,6 @@
 module Crosstest
   class Psychic
-    class Task < Struct.new(:name, :command)
+    class Task < CommandTemplate
     end
   end
 end

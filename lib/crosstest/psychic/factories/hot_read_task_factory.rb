@@ -14,8 +14,8 @@ module Crosstest
           !@tasks.empty?
         end
 
-        def command_for_task(task_name)
-          return @tasks[task_name.to_s] if @tasks.include? task_name.to_s
+        def command_for_task(task_alias)
+          return @tasks[task_alias.to_s] if @tasks.include? task_alias.to_s
           super
         end
       end

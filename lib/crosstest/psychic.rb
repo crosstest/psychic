@@ -8,6 +8,11 @@ autoload :Thor, 'thor'
 module Crosstest
   autoload :Shell,  'crosstest/shell'
   autoload :OutputHelper, 'crosstest/output_helper'
+
+  # The primary interface for using Psychic as an API.
+  #
+  # Detects scripts and tools that can run tasks in the instance's working directory,
+  # so that Psychic can act as a universal task/script selection and execution system.
   class Psychic
     autoload :Tokens,   'crosstest/psychic/tokens'
     module Tokens
@@ -18,15 +23,15 @@ module Crosstest
     autoload :FileFinder, 'crosstest/psychic/file_finder'
     autoload :FactoryManager, 'crosstest/psychic/factory_manager'
     autoload :ScriptFactoryManager, 'crosstest/psychic/script_factory_manager'
+    autoload :ScriptFactoryManager, 'crosstest/psychic/script_factory_manager'
     autoload :TaskFactoryManager, 'crosstest/psychic/task_factory_manager'
     autoload :MagicTaskFactory, 'crosstest/psychic/magic_task_factory'
     autoload :ScriptFactory, 'crosstest/psychic/script_factory'
     autoload :CommandTemplate, 'crosstest/psychic/command_template'
     autoload :Task, 'crosstest/psychic/task'
     autoload :Script, 'crosstest/psychic/script'
-    autoload :ScriptFinder, 'crosstest/psychic/script_finder'
-    autoload :ScriptRunner, 'crosstest/psychic/script_runner'
     autoload :TaskRunner, 'crosstest/psychic/task_runner'
+    autoload :ScriptRunner, 'crosstest/psychic/script_runner'
 
     FactoryManager.autoload_factories!
 
@@ -34,18 +39,41 @@ module Crosstest
     include Shell
     include TaskRunner
     include ScriptRunner
-    attr_reader :name, :cwd, :env, :os, :hints, :parameters, :opts
+
+    # @return [String] A name for logging and reporting.
+    # The default value is the name of the current working directory.
+    attr_reader :name
+    # @return [Dir] Current working directory for running commands.
+    attr_reader :cwd
     alias_method :basedir, :cwd
+    # @return [Hash] Environment variables to use when executing commands.
+    #   The default is to pass all environment variables to the command.
+    attr_reader :env
+    # @return [String] The Operating System to target. Autodetected if unset.
+    attr_reader :os
+    # @return [Hints] Psychic "hints" that are used to help Psychic locate tasks or scripts.
+    attr_reader :hints
+    # @return [Hash] Parameters to use as input for scripts.
+    attr_reader :parameters
+    # @return [Hash] Additional options
+    attr_reader :opts
 
     DEFAULT_PARAMS_FILE = 'psychic-parameters.yaml'
 
-    def initialize(opts = { cwd: Dir.pwd }) # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
-      # TODO: Will reduce method length after further splitting Runner vs TaskFactory
-      fail 'cwd is required' unless opts[:cwd]
+    # Creates a new Psychic instance that can be used to execute tasks and scripts.
+    # All options are
+    # @params [Hash] opts
+    # @option opts [Dir] :cwd sets the current working directory
+    # @option opts [Logger] :logger assigns a logger
+    # @option opts [Hash] :env sets environment variables
+    # @option opts [String] :name a name for logging and reporting
+    # @option opts [String] :os the target operating system
+    # @option opts [String] :interactive run psychic in interactive mode, where it will prompt for input
+    def initialize(opts = { cwd: Dir.pwd  }) # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
+      opts[:cwd] ||= Dir.pwd
       # must be a string on windows...
-      opts[:cwd] = Pathname(opts[:cwd]).to_s
+      @cwd = opts[:cwd] = Pathname(opts[:cwd]).to_s
       @opts = opts
-      init_attr(:cwd) { Dir.pwd }
       init_attr(:name) { File.basename cwd }
       init_hints
       init_attr(:logger) { new_logger }
@@ -56,17 +84,28 @@ module Crosstest
       @parameters = load_parameters(opts[:parameters])
     end
 
+    # Executes a command using the options set on this Psychic instance.
+    #   @param [String] command the command to execute
+    #   @param [*args] *args additional arguments to join to the command
+    #   @return [ExecutionResult] the result of running the command
+    #   @raises [ExecutionError] if the command
+    #
+    # @example
+    #   psychic.execute('echo', 'hello', 'world')
+    #   #<Crosstest::Shell::ExecutionResult:0x007fdfe15208f0 @command="echo hello world",
+    #     @exitstatus=0, @stderr="", @stdout="hello world\n">
+    #
+    # @example
+    #   psychic.execute('foo')
+    #   # Crosstest::Shell::ExecutionError: No such file or directory - foo
     def execute(command, *args)
-      # Crossdoc sends raw strings to execute...
-      full_cmd = if command.respond_to? :render
-                   command.render(*args)
-                 else
-                   [command, *args].join(' ')
-                 end
+      full_cmd = [command, *args].join(' ')
       logger.info("Executing: #{full_cmd}")
       shell.execute(full_cmd, @shell_opts)
     end
 
+    # Detects the Operating System family for the selected Operating System.
+    # @return [Symbol] The operating system family for {#os}.
     def os_family
       case os
       when /mswin|msys|mingw|cygwin|bccwin|wince|emc/
@@ -80,6 +119,11 @@ module Crosstest
       else
         :unknown
       end
+    end
+
+    # @return [Boolean] true if Psychic is in interactive mode and will prompt for decisions
+    def interactive?
+      @opts[:interactive]
     end
 
     private

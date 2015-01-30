@@ -12,13 +12,17 @@ module Crosstest
       def find_file(name)
         return name if File.exist? File.expand_path(name, search_path)
 
-        # Filter out ignored filesFind the first file, not including generated files
+        # Filter out ignored files
         files = potential_files(name).select do |f|
           !ignored? f
         end
 
-        # Select the shortest path, likely the best match
-        file = files.min_by(&:length)
+        if block_given?
+          file = yield files
+        else
+          # Select the shortest path, likely the best match
+          file = files.min_by(&:length)
+        end
 
         fail Errno::ENOENT, "No file was found for #{name} within #{search_path}" if file.nil?
         Crosstest::Core::FileSystem.relativize(file, search_path)
@@ -57,8 +61,8 @@ module Crosstest
         end
       end
 
-      def self.find_file_by_alias(file_alias, search_path, ignored_patterns = nil)
-        FileFinder.new(search_path, ignored_patterns).find_file(file_alias)
+      def self.find_file_by_alias(file_alias, search_path, ignored_patterns = nil, &block)
+        FileFinder.new(search_path, ignored_patterns).find_file(file_alias, &block)
       end
     end
   end

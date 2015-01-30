@@ -10,6 +10,12 @@ module Crosstest
           factory.priority_for_script(script)
         end
       end
+
+      def priority_for(script)
+        active_factories.map do | factory |
+          factory.priority_for_script(script) || 0
+        end.max
+      end
     end
   end
 end

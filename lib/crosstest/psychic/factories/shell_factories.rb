@@ -11,7 +11,7 @@ module Crosstest
         protected
 
         def relativize_cmd(cmd)
-          cmd = Crosstest::Core::FileSystem.relativize(cmd, psychic.cwd)
+          cmd = Crosstest::Core::FileSystem.relativize(cmd, cwd)
           "./#{cmd}" unless cmd.to_s.start_with? '/'
         end
       end
@@ -24,14 +24,14 @@ module Crosstest
 
         def initialize(*args)
           super
-          @known_tasks = Dir.glob("#{@cwd}/scripts/*", File::FNM_CASEFOLD).map do | script |
+          @known_tasks = Dir.glob("#{cwd}/scripts/*", File::FNM_CASEFOLD).map do | script |
             File.basename(script, File.extname(script)) if EXTENSIONS.include?(File.extname(script))
           end
         end
 
-        def command_for_task(task_name)
-          task = task_name.to_s
-          script = Dir.glob("#{@cwd}/scripts/#{task}{.sh,}", File::FNM_CASEFOLD).first
+        def command_for_task(task_alias)
+          task = task_alias.to_s
+          script = Dir.glob("#{cwd}/scripts/#{task}{.sh,}", File::FNM_CASEFOLD).first
           relativize_cmd(script) if script
         end
       end
@@ -70,7 +70,7 @@ module Crosstest
         protected
 
         def run_script_command
-          psychic.command_for_task('run_script')
+          psychic.task('run_script')
         rescue TaskNotImplementedError
           nil
         end

@@ -12,9 +12,9 @@ module Crosstest
         end
 
         def setup_runner
-          runner_opts = { cwd: Dir.pwd, cli: shell, parameters: options.parameters }
+          runner_opts = { cli: shell, parameters: options.parameters }
           runner_opts.merge!(Crosstest::Core::Util.symbolized_hash(options))
-          Crosstest::Psychic.new(runner_opts)
+          Crosstest::Psychic.new(Dir.pwd, runner_opts)
         end
       end
     end
@@ -27,27 +27,27 @@ module Crosstest
       method_option :cwd, desc: 'Working directory for detecting and running commands'
       method_option :os, desc: "Target OS (default value is `RbConfig::CONFIG['host_os']`)"
       method_option :print, aliases: '-p', desc: 'Print the command (or script) instead of running it'
-      def task(task_name = nil) # rubocop:disable Metrics/AbcSize
-        abort 'You must specify a task name, run `psychic list tasks` for a list of known tasks' unless task_name
-        command = psychic.command_for_task(task_name, *extra_args)
+      def task(task_alias = nil) # rubocop:disable Metrics/AbcSize
+        abort 'You must specify a task name, run `psychic list tasks` for a list of known tasks' unless task_alias
+        command = psychic.task(task_alias, *extra_args)
         if options[:print]
           say command
         else
           psychic.execute command
         end
       rescue TaskNotImplementedError => e
-        abort "No usable command was found for task #{task_name}"
+        abort "No usable command was found for task #{task_alias}"
       rescue Crosstest::Shell::ExecutionError => e
-        say_status :failed, task_name, :red
+        say_status :failed, task_alias, :red
         say e.execution_result if e.execution_result
       end
 
-      BUILT_IN_TASKS.each do |task_name|
-        desc task_name, "Executes the #{task_name} task"
+      BUILT_IN_TASKS.each do |task_alias|
+        desc task_alias, "Executes the #{task_alias} task"
         method_option :verbose, aliases: '-v', desc: 'Verbose: display more details'
         method_option :cwd, desc: 'Working directory for detecting and running commands'
-        define_method(task_name) do
-          task(task_name)
+        define_method(task_alias) do
+          task(task_alias)
         end
       end
 
@@ -68,9 +68,9 @@ module Crosstest
           psychic.execute command
         end
       rescue ScriptNotRunnable => e
-        abort "No usable command was found for task #{task_name}"
+        abort "No usable command was found for task #{task_alias}"
       rescue Crosstest::Shell::ExecutionError => e
-        say_status :failed, task_name, :red
+        say_status :failed, task_alias, :red
         say e.execution_result if e.execution_result
       end
 
@@ -92,7 +92,7 @@ module Crosstest
           psychic.known_tasks.map do |task|
             task_id = set_color(task, :bold)
             if options[:verbose]
-              details = psychic.command_for_task(task)
+              details = psychic.task(task)
               details = "\n#{details}".lines.join('  ') if details.lines.size > 1
               say "#{task_id}: #{details}"
             else
@@ -107,7 +107,7 @@ module Crosstest
         method_option :verbose, aliases: '-v', desc: 'Verbose: display more details'
         method_option :cwd, desc: 'Working directory for detecting and running commands'
         def script(script_name)
-          script = psychic.find_script(script_name)
+          script = psychic.script(script_name)
           say script.to_s(options[:verbose])
         end
       end

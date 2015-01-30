@@ -1,8 +1,8 @@
 module Crosstest
   class Psychic
     class TaskNotImplementedError < NotImplementedError
-      def initialize(task_name)
-        super("no active task factories can run a task named #{task_name}")
+      def initialize(task_alias)
+        super("no active task factories can run a task named #{task_alias}")
       end
     end
 

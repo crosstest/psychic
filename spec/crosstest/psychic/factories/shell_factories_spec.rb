@@ -4,7 +4,7 @@ module Crosstest
       RSpec.describe ShellTaskFactory do
         let(:psychic) { Psychic.new(cwd: current_dir) }
         let(:shell) { Crosstest::Shell.shell = double('shell') }
-        subject { described_class.new(psychic, cwd: current_dir) }
+        subject { described_class.new(psychic) }
 
         shared_context 'with scripts/*.sh files' do
           before(:each) do

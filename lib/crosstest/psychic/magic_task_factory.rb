@@ -2,10 +2,12 @@ module Crosstest
   class Psychic
     class MagicTaskFactory
       include Crosstest::Core::Logger
+      extend Forwardable
+      def_delegators :psychic, :cwd, :env, :logger
 
       TASK_PRIORITY = 5
 
-      attr_reader :known_tasks, :tasks, :cwd, :env, :hints, :priority, :psychic
+      attr_reader :known_tasks, :tasks, :hints, :priority, :psychic
 
       class << self
         def register_task_factory
@@ -47,24 +49,21 @@ module Crosstest
         @psychic = psychic
         @opts = opts
         @priority = self.class::TASK_PRIORITY
-        init_attr(:cwd) { Dir.pwd }
         init_attr(:known_tasks) { self.class.known_tasks }
         init_attr(:tasks) { self.class.tasks }
-        init_attr(:logger) { new_logger }
-        init_attr(:env) { ENV.to_hash }
       end
 
-      def command_for_task(task_name, *_args)
-        task_name = task_name.to_s
-        task = tasks[task_name] if tasks.include? task_name
+      def command_for_task(task_alias, *_args)
+        task_alias = task_alias.to_s
+        task = tasks[task_alias] if tasks.include? task_alias
         task = task.call if task.respond_to? :call
-        fail Crosstest::Psychic::TaskNotImplementedError, task_name if task.nil?
+        fail Crosstest::Psychic::TaskNotImplementedError, task_alias if task.nil?
         task
       end
 
       def active?
         self.class.magic_file_patterns.each do | pattern |
-          return true unless Dir.glob("#{@cwd}/#{pattern}", File::FNM_CASEFOLD).empty?
+          return true unless Dir.glob("#{cwd}/#{pattern}", File::FNM_CASEFOLD).empty?
         end
         self.class.magic_env_vars.each do | var |
           return true if ENV[var]
@@ -72,12 +71,12 @@ module Crosstest
         false
       end
 
-      def known_task?(task_name)
-        known_tasks.include?(task_name.to_s)
+      def known_task?(task_alias)
+        known_tasks.include?(task_alias.to_s)
       end
 
-      def priority_for_task(task_name)
-        priority if known_task? task_name
+      def priority_for_task(task_alias)
+        priority if known_task? task_alias
       end
 
       private

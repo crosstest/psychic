@@ -27,7 +27,7 @@ module Crosstest
 
       def fake_script(name)
         write_file name, ''
-        psychic.find_script name
+        psychic.script name
       end
 
       describe '#initialize' do

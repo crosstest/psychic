@@ -9,14 +9,14 @@ module Crosstest
 
         def initialize(psychic, opts = {})
           super
-          @known_tasks = Dir["#{@cwd}/scripts/*"].map do | script |
+          @known_tasks = Dir["#{cwd}/scripts/*"].map do | script |
             File.basename(script, File.extname(script)) if EXTENSIONS.include?(File.extname(script))
           end
         end
 
-        def command_for_task(task_name)
-          task = task_name.to_s
-          script = Dir["#{@cwd}/scripts/#{task}{.ps1}"].first
+        def command_for_task(task_alias)
+          task = task_alias.to_s
+          script = Dir["#{cwd}/scripts/#{task}{.ps1}"].first
           relativize_cmd(script) if script
         end
 
@@ -27,7 +27,7 @@ module Crosstest
         private
 
         def relativize_cmd(cmd)
-          cmd = Crosstest::Core::FileSystem.relativize(cmd, @cwd)
+          cmd = Crosstest::Core::FileSystem.relativize(cmd, cwd)
           "PowerShell -NoProfile -ExecutionPolicy Bypass -File \"#{cmd}\""
         end
       end
@@ -40,7 +40,7 @@ module Crosstest
         end
 
         def command_for_script(script)
-          script = psychic.command_for_task('run_script')
+          script = psychic.task('run_script')
           if script
             "#{script} #{script.source_file}"
           else
