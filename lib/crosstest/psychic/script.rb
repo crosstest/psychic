@@ -2,7 +2,7 @@ require 'crosstest/psychic/code_helper'
 
 module Crosstest
   class Psychic
-    class Script < CommandTemplate
+    class Script < CommandTemplate # rubocop:disable Metrics/ClassLength
       include CodeHelper
       include Crosstest::OutputHelper
 
@@ -37,6 +37,8 @@ module Crosstest
       end
 
       def execute(params = nil, *extra_args)
+        params ||= psychic.parameters
+        process_parameters(params) if params
         command_params = { script: name, script_file: source_file }
         command_params.merge!(params) unless params.nil?
         super command_params, *extra_args
@@ -64,15 +66,15 @@ module Crosstest
         psychic.interactive?
       end
 
-      def process_parameters(script_file)
+      def process_parameters(parameters)
         if tokenized?
-          backup_and_overwrite(script_file)
+          backup_and_overwrite(absolute_source_file)
 
-          template = File.read(script_file)
+          template = File.read(absolute_source_file)
           # Default token pattern/replacement (used by php-opencloud) should be configurable
           token_handler = Tokens::RegexpTokenHandler.new(template, /'\{(\w+)\}'/, "'\\1'")
           confirm_or_update_parameters(token_handler.tokens)
-          File.write(script_file, token_handler.render(@parameters))
+          File.write(absolute_source_file, token_handler.render(parameters))
         end
       end
 

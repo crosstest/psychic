@@ -13,7 +13,7 @@ module Crosstest
   #
   # Detects scripts and tools that can run tasks in the instance's working directory,
   # so that Psychic can act as a universal task/script selection and execution system.
-  class Psychic
+  class Psychic # rubocop:disable Metrics/ClassLength
     autoload :Tokens,   'crosstest/psychic/tokens'
     module Tokens
       autoload :RegexpTokenHandler,   'crosstest/psychic/tokens'

@@ -39,6 +39,10 @@ module Crosstest
         true
       end
 
+      def cwd
+        psychic.cwd
+      end
+
       def known_scripts
         cwd_path = Pathname(cwd)
         self.class.run_patterns.flat_map do | pattern, _priority |
