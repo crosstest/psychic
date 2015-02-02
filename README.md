@@ -213,6 +213,12 @@ I, [2015-01-30T17:24:41.359478 #46319]  INFO -- :                               
 ...
 ```
 
+## Acknowledgements
+
+Portions of the Crosstest projects were based on [rocco](https://github.com/rtomayko/rocco) projects, which was a port of [docco](https://github.com/jashkenas/docco).
+
+A lot of code, and the style of the CLI tools, are based on heavily modified code adapted from [test-kitchen](https://github.com/test-kitchen/test-kitchen).
+
 ## Related projects
 
 ### Skeptic
