@@ -100,7 +100,7 @@ module Crosstest
     #   # Crosstest::Shell::ExecutionError: No such file or directory - foo
     def execute(command, *args)
       full_cmd = [command, *args].join(' ')
-      logger.info("Executing: #{full_cmd}")
+      logger.banner("Executing: #{full_cmd}")
       shell.execute(full_cmd, @shell_opts)
     end
 

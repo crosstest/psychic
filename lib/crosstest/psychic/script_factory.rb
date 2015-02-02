@@ -32,7 +32,7 @@ module Crosstest
       def initialize(psychic, opts)
         @psychic = psychic
         @opts = opts
-        @logger = opts[:logger] || new_logger
+        @logger = psychic.logger
       end
 
       def active?
