@@ -107,9 +107,9 @@ module Crosstest
           command.execute(*extra_args)
         end
       rescue ScriptNotRunnable => e
-        abort "No usable command was found for task #{task_alias}"
+        abort "No usable command was found for script #{script_name}"
       rescue Crosstest::Shell::ExecutionError => e
-        say_status :failed, task_alias, :red
+        say_status :failed, script_name, :red
         say e.execution_result if e.execution_result
       end
 

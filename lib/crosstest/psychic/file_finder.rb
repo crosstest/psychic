@@ -14,7 +14,7 @@ module Crosstest
 
         # Filter out ignored files
         files = potential_files(name).select do |f|
-          !ignored? f
+          !ignored?(f)
         end
 
         if block_given?

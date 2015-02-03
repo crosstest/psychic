@@ -99,9 +99,11 @@ module Crosstest
     #   psychic.execute('foo')
     #   # Crosstest::Shell::ExecutionError: No such file or directory - foo
     def execute(command, *args)
+      shell_opts = @shell_opts.dup
+      shell_opts.merge!(args.shift) if args.first.is_a? Hash
       full_cmd = [command, *args].join(' ')
       logger.banner("Executing: #{full_cmd}")
-      shell.execute(full_cmd, @shell_opts)
+      shell.execute(full_cmd, shell_opts)
     end
 
     # Detects the Operating System family for the selected Operating System.
@@ -170,8 +172,8 @@ module Crosstest
         file ||= File.expand_path(DEFAULT_PARAMS_FILE, cwd)
         return {} unless File.exist? file
       end
-      parameters = Tokens.replace_tokens(File.read(file), @env)
-      YAML.load(parameters)
+      # Just return it as a template, not as YAML
+      File.read(file)
     end
   end
 end

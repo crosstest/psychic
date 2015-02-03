@@ -28,14 +28,36 @@ module Crosstest
       end
 
       describe '#execute' do
-        it 'can accept a string' do
+        it 'can accept additional arguments' do
           if subject.os_family == :windows
             cmd = 'Write-Host'
           else
             cmd = 'echo'
           end
-          execution_result = subject.execute(cmd, 'hi')
-          expect(execution_result.stdout.strip).to eq('hi')
+          execution_result = subject.execute(cmd, 'hi', 'max')
+          expect(execution_result.stdout.strip).to eq('hi max')
+        end
+
+        it 'can accept a hash of shell opts' do
+          if subject.os_family == :windows
+            cmd = 'Write-Host $env:FOO'
+          else
+            cmd = 'echo $FOO'
+          end
+
+          execution_result = subject.execute(cmd, env: { 'FOO' => 'BAR' })
+          expect(execution_result.stdout.strip).to eq('BAR')
+        end
+
+        it 'can accept a hash of shell opts and extra args' do
+          if subject.os_family == :windows
+            cmd = 'Write-Host $env:FOO'
+          else
+            cmd = 'echo $FOO'
+          end
+
+          execution_result = subject.execute(cmd, { env: { 'FOO' => 'BAR' } }, 'baz')
+          expect(execution_result.stdout.strip).to eq('BAR baz')
         end
       end
     end

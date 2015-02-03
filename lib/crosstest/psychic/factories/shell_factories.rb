@@ -46,7 +46,7 @@ module Crosstest
         end
 
         def priority_for_script(script)
-          return 7 if shell_task_factory.known_task? :run_script
+          return 8 if shell_task_factory.known_task? :run_script
 
           case script.extname
           when '.sh'
@@ -78,6 +78,10 @@ module Crosstest
         def shebang?(script)
           first_line = script.source.lines.first
           first_line && first_line.match(/\#\!/)
+        rescue => e
+          logger.warn("Could not read #{script.source_file}: #{e.message}")
+          # Could be binary, unknown encoding, ...
+          false
         end
       end
     end

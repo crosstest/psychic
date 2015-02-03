@@ -12,6 +12,9 @@ module Crosstest
       attr_reader :source_file
       # @return [Hash] options controlling how the script is executed
       attr_reader :opts
+      # @return [Hash] params key/value pairs to bind to script input
+      attr_accessor :params
+      attr_accessor :env
 
       def initialize(psychic, name, source_file, opts = {})
         fail ArgumentError if psychic.nil?
@@ -20,6 +23,8 @@ module Crosstest
         @name = name.to_s
         @source_file = Pathname(source_file)
         @opts ||= opts
+        @env = opts[:env] || psychic.env
+        @params = opts[:params] ||= psychic.parameters
         super psychic, ''
       end
 
@@ -36,12 +41,11 @@ module Crosstest
         @token_handler ||= Tokens::RegexpTokenHandler.new(source, /'\{(\w+)\}'/, "'\\1'")
       end
 
-      def execute(params = nil, *extra_args)
-        params ||= psychic.parameters
-        process_parameters(params) if params
+      def execute(*extra_args)
+        process_parameters if params
         command_params = { script: name, script_file: source_file }
         command_params.merge!(params) unless params.nil?
-        super command_params, *extra_args
+        super(command_params, *extra_args)
       end
 
       def to_s(verbose = false)
@@ -66,19 +70,25 @@ module Crosstest
         psychic.interactive?
       end
 
-      def process_parameters(parameters)
-        if tokenized?
-          backup_and_overwrite(absolute_source_file)
-
-          template = File.read(absolute_source_file)
-          # Default token pattern/replacement (used by php-opencloud) should be configurable
-          token_handler = Tokens::RegexpTokenHandler.new(template, /'\{(\w+)\}'/, "'\\1'")
-          confirm_or_update_parameters(token_handler.tokens, parameters)
-          File.write(absolute_source_file, token_handler.render(parameters))
+      def process_parameters # rubocop
+        if params.is_a? String
+          self.params = YAML.load(Tokens.replace_tokens(params, env))
         end
+
+        process_tokens if tokenized?
       end
 
       private
+
+      # This will be moved to separate classes for different input strategies...
+      def process_tokens
+        backup_and_overwrite(absolute_source_file)
+        template = File.read(absolute_source_file)
+        # Default token pattern/replacement (used by php-opencloud) should be configurable
+        token_handler = Tokens::RegexpTokenHandler.new(template, /'\{(\w+)\}'/, "'\\1'")
+        confirm_or_update_parameters(token_handler.tokens)
+        File.write(absolute_source_file, token_handler.render(params))
+      end
 
       def build_command
         return @command if defined? @command
@@ -122,7 +132,7 @@ module Crosstest
           if should_restore?(backup_file, file)
             FileUtils.mv(backup_file, file)
           else
-            abort 'Please clear out old backups before rerunning' if File.exist? backup_file
+            fail 'Please clear out old backups before rerunning' if File.exist? backup_file
           end
         end
         FileUtils.cp(file, backup_file)
@@ -136,7 +146,6 @@ module Crosstest
       end
 
       def prompt(key)
-        params = psychic.parameters
         value = params[key]
         if value
           return value unless  opts[:interactive] == 'always'
@@ -147,7 +156,7 @@ module Crosstest
         end
       end
 
-      def confirm_or_update_parameters(required_parameters, params)
+      def confirm_or_update_parameters(required_parameters)
         required_parameters.each do | key |
           params[key] = prompt(key)
         end if interactive?
