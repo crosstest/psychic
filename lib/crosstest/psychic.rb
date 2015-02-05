@@ -1,5 +1,5 @@
-require 'crosstest/psychic/version'
 require 'crosstest/core'
+require 'crosstest/psychic/version'
 require 'crosstest/psychic/error'
 require 'yaml'
 
@@ -18,6 +18,12 @@ module Crosstest
     module Tokens
       autoload :RegexpTokenHandler,   'crosstest/psychic/tokens'
       autoload :MustacheTokenHandler,   'crosstest/psychic/tokens'
+    end
+    module Execution
+      autoload :DefaultStrategy, 'crosstest/psychic/execution/default_strategy'
+      autoload :TokenStrategy, 'crosstest/psychic/execution/token_strategy'
+      autoload :EnvStrategy, 'crosstest/psychic/execution/env_strategy'
+      autoload :FlagStrategy, 'crosstest/psychic/execution/flag_strategy'
     end
     autoload :Hints, 'crosstest/psychic/hints'
     autoload :FileFinder, 'crosstest/psychic/file_finder'
