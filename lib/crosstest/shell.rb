@@ -12,16 +12,10 @@ module Crosstest
       :live_stderr, :input, :logger, :log_level, :log_tag, :env
     ]
 
-    class << self
-      attr_writer :shell
-    end
-
-    def self.shell
-      @shell ||= RUBY_PLATFORM == 'java' ? BuffShellOutExecutor.new : MixlibShellOutExecutor.new
-    end
+    attr_writer :shell
 
     def shell
-      Crosstest::Shell.shell
+      @shell ||= RUBY_PLATFORM == 'java' ? BuffShellOutExecutor.new : MixlibShellOutExecutor.new
     end
   end
 end

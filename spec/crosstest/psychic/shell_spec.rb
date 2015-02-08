@@ -1,6 +1,6 @@
 module Crosstest
   RSpec.describe Shell do
-    subject { described_class.shell }
+    subject { Psychic.new(cwd: current_dir).shell }
 
     let(:is_windows?) do
       RbConfig::CONFIG['host_os'] =~ /mswin|msys|mingw|cygwin|bccwin|wince|emc/
@@ -8,7 +8,7 @@ module Crosstest
 
     let(:pwd_cmd) { is_windows? ? 'echo %cd%' : 'pwd' }
 
-    describe '.shell' do
+    describe '#shell' do
       it 'returns an appropriate shell for the platform' do
         if RUBY_PLATFORM == 'java'
           expect(subject).to be_an_instance_of Shell::BuffShellOutExecutor

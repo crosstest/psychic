@@ -21,7 +21,7 @@ module Crosstest
         task :bootstrap do
           # This is for projects using the maven plugin, may need to detect available
           # tasks w/ gradle install first
-          'gradle install'
+          'gradle assemble'
         end
       end
 

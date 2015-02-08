@@ -17,7 +17,7 @@ module Crosstest
 
         describe '#execute' do
           it 'does not permanently alter the file' do
-            expect{subject.execute}.to_not change{ File.read("#{current_dir}/sample.rb") }
+            expect { subject.execute }.to_not change { File.read("#{current_dir}/sample.rb") }
           end
         end
       end

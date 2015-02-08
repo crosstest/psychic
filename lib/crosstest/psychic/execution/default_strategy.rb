@@ -12,7 +12,7 @@ module Crosstest
 
         def execute(*args)
           shell_opts = args.shift if args.first.is_a? Hash
-          shell_opts ||= {env: script.env}
+          shell_opts ||= { env: script.env }
           expand_parameters
           params = script.params
           command_params = { script: script.name, script_file: script.source_file }

@@ -38,7 +38,7 @@ module Crosstest
         register_task_factory
 
         task :test do
-          [bundle_command, "rake"].join
+          [bundle_command, 'rake'].join
         end
       end
 

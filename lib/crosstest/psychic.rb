@@ -15,6 +15,7 @@ module Crosstest
   # so that Psychic can act as a universal task/script selection and execution system.
   class Psychic # rubocop:disable Metrics/ClassLength
     autoload :Tokens,   'crosstest/psychic/tokens'
+    autoload :CodeHelper, 'crosstest/psychic/code_helper'
     module Tokens
       autoload :RegexpTokenHandler,   'crosstest/psychic/tokens'
       autoload :MustacheTokenHandler,   'crosstest/psychic/tokens'

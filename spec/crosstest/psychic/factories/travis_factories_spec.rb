@@ -3,8 +3,11 @@ module Crosstest
     module Factories
       RSpec.describe TravisTaskFactory do
         let(:psychic) { Psychic.new(cwd: current_dir) }
-        let(:shell) { Crosstest::Shell.shell = double('shell') }
-        subject { described_class.new(psychic, cwd: current_dir) }
+        let(:shell) { double('shell') }
+        subject do
+          psychic.shell = shell
+          described_class.new(psychic, cwd: current_dir)
+        end
 
         shared_context 'without .travis.yml' do
         end
@@ -41,15 +44,19 @@ module Crosstest
 
           describe '#bootstrap' do
             it 'returns travis run install' do
-              expect(subject.task(:bootstrap)).to eq(
-                'travis run --skip-version-check install'
+              expect(shell).to receive(:execute).with('travis run --print --skip-version-check install', cwd: current_dir).and_return(
+                Fabricate(:execution_result, stdout: 'script from travis')
               )
+              expect(subject.task(:bootstrap)).to eq('script from travis')
             end
           end
 
           describe '#test' do
             it 'returns travis run script' do
-              expect(subject.task(:test)).to eq('travis run --skip-version-check script')
+              expect(shell).to receive(:execute).with('travis run --print --skip-version-check script', cwd: current_dir).and_return(
+                Fabricate(:execution_result, stdout: 'script from travis')
+              )
+              expect(subject.task(:test)).to eq('script from travis')
             end
           end
         end

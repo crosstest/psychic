@@ -16,12 +16,10 @@ module Crosstest
       end
 
       def command
-        @commands.map do | subcommand |
-          subcommand.command
-        end.join("\n") + "\n"
+        @commands.map(&:command).join("\n") + "\n"
       end
 
-      def execute(params = {}, shell_opts = {}, *extra_args)
+      def execute(_params = {}, shell_opts = {}, *extra_args)
         @psychic.execute(command, shell_opts, *extra_args)
       end
     end
