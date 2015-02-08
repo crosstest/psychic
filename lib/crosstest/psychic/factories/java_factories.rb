@@ -10,7 +10,7 @@ module Crosstest
           'gradle assemble'
         end
 
-        task :unit do
+        task :test do
           'gradle test'
         end
 
@@ -27,14 +27,14 @@ module Crosstest
 
       class MavenFactory < MagicTaskFactory
         TASK_PRIORITY = 6
-        magic_file 'build.xml'
+        magic_file 'pom.xml'
         register_task_factory
 
         task :compile do
           'mvn compile'
         end
 
-        task :unit do
+        task :test do
           'mvn test'
         end
 

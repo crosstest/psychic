@@ -21,11 +21,11 @@ module Crosstest
         end
 
         task :bootstrap do
-          'travis run --skip-version-check install'
+          psychic.execute('travis run --print --skip-version-check install').stdout
         end
 
         task :test do
-          'travis run --skip-version-check script'
+          psychic.execute('travis run --print --skip-version-check script').stdout
         end
       end
     end

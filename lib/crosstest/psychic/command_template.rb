@@ -13,8 +13,10 @@ module Crosstest
         Tokens.replace_tokens(build_command, params)
       end
 
-      def execute(params = {}, shell_opts = {}, *extra_args)
-        @psychic.execute(command(params), shell_opts, *extra_args)
+      def execute(params = {}, *args)
+        shell_opts = args.shift if args.first.is_a? Hash
+        shell_opts ||= {}
+        @psychic.execute(command(params), shell_opts, *args)
       end
 
       alias_method :to_s, :command

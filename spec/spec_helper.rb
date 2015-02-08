@@ -6,6 +6,10 @@ require 'crosstest/psychic'
 require 'aruba'
 require 'aruba/api'
 
+# Includes shared examples
+require 'crosstest/psychic/execution/default_strategy_spec'
+
+
 # Config required for project
 RSpec.configure do | config |
   config.include Aruba::Api

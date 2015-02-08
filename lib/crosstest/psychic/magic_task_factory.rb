@@ -56,7 +56,7 @@ module Crosstest
       def task(task_alias, *_args)
         task_alias = task_alias.to_s
         task = tasks[task_alias] if tasks.include? task_alias
-        task = task.call if task.respond_to? :call
+        task = instance_eval(&task) if task.respond_to? :call
         fail Crosstest::Psychic::TaskNotImplementedError, task_alias if task.nil?
         task
       end

@@ -10,12 +10,14 @@ module Crosstest
           super(script.psychic, build_command)
         end
 
-        def execute(*extra_args)
+        def execute(*args)
+          shell_opts = args.shift if args.first.is_a? Hash
+          shell_opts ||= {env: script.env}
           expand_parameters
           params = script.params
           command_params = { script: script.name, script_file: script.source_file }
           command_params.merge!(params) unless params.nil?
-          super(command_params, *extra_args)
+          super(command_params, shell_opts, *args)
         end
 
         def build_command

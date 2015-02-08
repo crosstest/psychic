@@ -1,5 +1,4 @@
 require 'spec_helper'
-require 'crosstest/psychic/execution/default_strategy_spec'
 
 module Crosstest
   class Psychic

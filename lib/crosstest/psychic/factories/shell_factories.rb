@@ -19,19 +19,19 @@ module Crosstest
       class ShellTaskFactory < MagicTaskFactory
         include ShellBase
         TASK_PRIORITY = 1
-        magic_file 'scripts/*'
+        magic_file '{script,scripts}/*'
         register_task_factory
 
         def initialize(*args)
           super
-          @known_tasks = Dir.glob("#{cwd}/scripts/*", File::FNM_CASEFOLD).map do | script |
+          @known_tasks = Dir.glob("#{cwd}/{script,scripts}/*", File::FNM_CASEFOLD).map do | script |
             File.basename(script, File.extname(script)) if EXTENSIONS.include?(File.extname(script))
           end
         end
 
         def task(task_alias)
           task = task_alias.to_s
-          script = Dir.glob("#{cwd}/scripts/#{task}{.sh,}", File::FNM_CASEFOLD).first
+          script = Dir.glob("#{cwd}/{script,scripts}/#{task}{.sh,}", File::FNM_CASEFOLD).first
           relativize_cmd(script) if script
         end
       end

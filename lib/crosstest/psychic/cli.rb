@@ -113,6 +113,34 @@ module Crosstest
         say e.execution_result if e.execution_result
       end
 
+      desc 'workflow [*tasks]', 'Executes multiple tasks together as a single workflow'
+      method_option :verbose, aliases: '-v', desc: 'Verbose: display more details'
+      method_option :cwd, desc: 'Working directory for detecting and running commands'
+      method_option :os, desc: "Target OS (default value is `RbConfig::CONFIG['host_os']`)"
+      method_option :travis, type: :boolean, desc: "Enable/disable delegation to travis-build, if it's available"
+      method_option :print, aliases: '-p', desc: 'Print the command (or script) instead of running it'
+      method_option :name, desc: 'A display name for the workflow'
+      def workflow(*tasks)
+        abort 'Please specify at least one task' if tasks.empty?
+        workflow = psychic.workflow(options[:name], options) do
+          tasks.each do | task_alias |
+            begin
+              task task_alias
+            rescue TaskNotImplementedError => e
+              abort "No usable command was found for task #{task_alias}"
+            end
+          end
+        end
+        if options[:print]
+          say workflow.command
+        else
+          workflow.execute({}, {}, *extra_args)
+        end
+      rescue Crosstest::Shell::ExecutionError => e
+        say_status :failed, options[:name], :red
+        say e.execution_result if e.execution_result
+      end
+
       desc 'list', 'List known tasks or scripts'
       subcommand 'list', List
       desc 'show', 'Show details about a task or script'

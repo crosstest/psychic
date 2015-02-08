@@ -1,6 +1,18 @@
 module Crosstest
   class Psychic
     module Factories
+      module UsesBundler
+        def bundle_command
+          bundler_active? ? 'bundle exec ' : ''
+        end
+
+        protected
+
+        def bundler_active?
+          psychic.task_factory_manager.active? BundlerTaskFactory
+        end
+      end
+
       class BundlerTaskFactory < MagicTaskFactory
         TASK_PRIORITY = 2
         magic_file 'Gemfile'
@@ -20,19 +32,23 @@ module Crosstest
         end
       end
 
+      class RakeFactory < MagicTaskFactory
+        include UsesBundler
+        magic_file 'Rakefile'
+        register_task_factory
+
+        task :test do
+          [bundle_command, "rake"].join
+        end
+      end
+
       class RubyFactory < ScriptFactory
+        include UsesBundler
         register_script_factory
         runs '**.rb', 8
 
-        def script(_script)
-          cmd = bundler_active? ? 'bundle exec ' : ''
-          cmd << 'ruby {{script_file}}'
-        end
-
-        protected
-
-        def bundler_active?
-          psychic.task_factory_manager.active? BundlerTaskFactory
+        def script(script)
+          [bundle_command, "ruby #{script.source_file}"].join
         end
       end
     end

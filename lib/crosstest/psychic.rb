@@ -36,6 +36,7 @@ module Crosstest
     autoload :CommandTemplate, 'crosstest/psychic/command_template'
     autoload :Task, 'crosstest/psychic/task'
     autoload :Script, 'crosstest/psychic/script'
+    autoload :Workflow, 'crosstest/psychic/workflow'
     autoload :TaskRunner, 'crosstest/psychic/task_runner'
     autoload :ScriptRunner, 'crosstest/psychic/script_runner'
 
@@ -110,6 +111,10 @@ module Crosstest
       full_cmd = [command, *args].join(' ')
       logger.banner("Executing: #{full_cmd}")
       shell.execute(full_cmd, shell_opts)
+    end
+
+    def workflow(name = 'workflow', options = {}, &block)
+      Workflow.new(self, name, options, &block)
     end
 
     # Detects the Operating System family for the selected Operating System.
