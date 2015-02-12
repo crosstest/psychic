@@ -6,6 +6,8 @@ require 'crosstest/psychic'
 module Crosstest
   class Psychic
     class BaseCLI < Crosstest::Core::CLI
+      include Thor::Actions
+
       no_commands do
         def psychic
           @psychic ||= setup_runner
@@ -141,15 +143,27 @@ module Crosstest
         say e.execution_result if e.execution_result
       end
 
+      desc 'code2doc', 'Convert script to lightweight markup'
+      method_option :format,
+                   enum: %w(md rst),
+                   default: 'md',
+                   desc: 'Target documentation format'
+      method_option :destination,
+                   aliases: '-d',
+                   default: 'docs/',
+                   desc: 'The target directory where documentation for generated documentation.'
+      def code2doc(*script_names)
+        script_names.each do | script_name |
+          script = psychic.script(script_name)
+          target_file = File.expand_path(script.name + ".#{options[:format]}", options[:destination])
+          create_file(target_file, script.code2doc(options))
+        end
+      end
+
       desc 'list', 'List known tasks or scripts'
       subcommand 'list', List
       desc 'show', 'Show details about a task or script'
       subcommand 'show', Show
-
-      no_commands do
-        def show_script(_script_name)
-        end
-      end
     end
   end
 end

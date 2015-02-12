@@ -1,9 +1,7 @@
-require 'crosstest/psychic/code_helper'
-
 module Crosstest
   class Psychic
     class Script # rubocop:disable Metrics/ClassLength
-      include CodeHelper
+      include Code2Doc::CodeHelper
       include Crosstest::OutputHelper
 
       attr_reader :psychic
@@ -63,6 +61,12 @@ module Crosstest
       def to_path
         # So coercion to Pathname is possible
         source_file.to_s
+      end
+
+      def absolute_source_file
+        return nil if source_file.nil?
+
+        File.expand_path source_file, basedir
       end
 
       def detection_strategy
