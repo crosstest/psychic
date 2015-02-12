@@ -7,7 +7,7 @@ module Crosstest
           Script.new(psychic, 'test', @source_file)
         end
         let(:source) do
-<<-'eos'
+          <<-'eos'
 # This snippet should not be in the output.
 puts "Random: #{rand}"
 
@@ -19,7 +19,7 @@ puts 'Done'
 eos
         end
         let(:expected_snippet) do
-<<-'eos'
+          <<-'eos'
 puts 'Hello, world!'
 eos
         end
@@ -51,7 +51,7 @@ eos
         describe '#snippet_between' do
           # Yes, whitespace doesn't work very well w/ snippet_between
           let(:expected_snippet) do
-<<-'eos'
+            <<-'eos'
 puts "Random: #{rand}"
 # Snippet: Hello, world!
 puts 'Hello, world!'

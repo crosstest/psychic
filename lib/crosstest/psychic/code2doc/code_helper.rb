@@ -78,7 +78,7 @@ module Crosstest
           buffer.string
         end
 
-        def code2doc(options = {format: :markdown})
+        def code2doc(options = { format: :markdown })
           source_code = File.read(absolute_source_file)
           segmenter_language = infer_language(source_file)
 

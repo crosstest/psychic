@@ -145,13 +145,13 @@ module Crosstest
 
       desc 'code2doc', 'Convert script to lightweight markup'
       method_option :format,
-                   enum: %w(md rst),
-                   default: 'md',
-                   desc: 'Target documentation format'
+                    enum: %w(md rst),
+                    default: 'md',
+                    desc: 'Target documentation format'
       method_option :destination,
-                   aliases: '-d',
-                   default: 'docs/',
-                   desc: 'The target directory where documentation for generated documentation.'
+                    aliases: '-d',
+                    default: 'docs/',
+                    desc: 'The target directory where documentation for generated documentation.'
       def code2doc(*script_names)
         script_names.each do | script_name |
           script = psychic.script(script_name)
