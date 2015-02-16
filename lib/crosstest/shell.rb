@@ -17,5 +17,11 @@ module Crosstest
     def shell
       @shell ||= RUBY_PLATFORM == 'java' ? BuffShellOutExecutor.new : MixlibShellOutExecutor.new
     end
+
+    attr_writer :shell
+
+    def cli
+      @cli ||= Thor::Shell::Base.shell
+    end
   end
 end

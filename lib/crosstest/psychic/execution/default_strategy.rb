@@ -54,6 +54,12 @@ module Crosstest
           end
         end
 
+        private
+
+        def cli
+          psychic.cli
+        end
+
         def interactive?
           psychic.interactive?
         end
