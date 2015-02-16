@@ -5,7 +5,7 @@ module Crosstest
         def execute(*extra_args)
           template = File.read(absolute_file)
           # Default token pattern/replacement (used by php-opencloud) should be configurable
-          token_handler = Tokens::RegexpTokenHandler.new(template, /'\{(\w+)\}'/, "'\\1'")
+          token_handler = Tokens::RegexpTokenHandler.new(template, /["']\{(\w+)\}(["'])/, '\2\1\2')
           confirm_or_update_parameters(token_handler.tokens)
           content = token_handler.render(script.params)
           temporarily_overwrite(absolute_file, content) do
