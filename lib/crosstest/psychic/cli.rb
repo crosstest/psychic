@@ -60,7 +60,7 @@ module Crosstest
     end
 
     class CLI < BaseCLI
-      BUILT_IN_TASKS = %w(bootstrap)
+      BUILT_IN_TASKS = %w(bootstrap unittest acceptancetest)
 
       desc 'task <name>', 'Executes any task by name'
       method_option :verbose, aliases: '-v', desc: 'Verbose: display more details'

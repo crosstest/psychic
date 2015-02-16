@@ -24,7 +24,7 @@ module Crosstest
           psychic.execute('travis run --print --skip-version-check install').stdout
         end
 
-        task :test do
+        task :unittest do
           psychic.execute('travis run --print --skip-version-check script').stdout
         end
       end
