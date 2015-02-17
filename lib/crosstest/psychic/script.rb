@@ -1,3 +1,5 @@
+require 'shellwords'
+
 module Crosstest
   class Psychic
     class Script # rubocop:disable Metrics/ClassLength
@@ -14,6 +16,7 @@ module Crosstest
       attr_reader :opts
       # @return [Hash] params key/value pairs to bind to script input
       attr_accessor :params
+      attr_accessor :arguments
       attr_accessor :env
 
       def initialize(psychic, name, source_file, opts = {})
@@ -21,7 +24,8 @@ module Crosstest
         fail ArgumentError if name.nil?
         fail ArgumentError if source_file.nil?
         @name = name.to_s
-        @source_file = Pathname(source_file)
+        @source_file, *@arguments = Shellwords.shellsplit(source_file.to_s)
+        @source_file = Pathname(@source_file)
         @opts ||= opts
         @env = opts[:env] || psychic.env
         @params = opts[:params] ||= psychic.parameters

@@ -27,8 +27,15 @@ module Crosstest
           fail Crosstest::Psychic::ScriptNotRunnable, script if script_factory.nil?
 
           @command = script_factory.script(script)
+          if script.arguments
+            arguments = script.arguments.map do | arg |
+              Tokens.replace_tokens(arg, script.params)
+            end
+            @arguments = quote(arguments)
+          end
+          @command = "#{@command}" if script.arguments
           @command = @command.call if @command.respond_to? :call
-          @command
+          @command = [@command, @arguments].join(' ')
         end
 
         def prompt(key)
@@ -55,6 +62,12 @@ module Crosstest
         end
 
         private
+
+        def quote(values)
+          values.map do | value |
+            value.split.size > 1 ? "\"#{value}\"" : value
+          end
+        end
 
         def cli
           psychic.cli
