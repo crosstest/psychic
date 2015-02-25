@@ -9,13 +9,13 @@ branch = begin
            'master'
          end
 
-%w(crosstest-core).each do |lib|
+%w(omnitest-core).each do |lib|
   library_path = File.expand_path("../../#{lib}", __FILE__)
-  gem_name = lib.start_with?('crosstest') ? lib : "crosstest-#{lib}"
+  gem_name = lib.start_with?('omnitest') ? lib : "omnitest-#{lib}"
   if File.exist?(library_path) && !ENV['USE_GIT_REPOS']
     gem gem_name, path: library_path
   else
-    gem gem_name, git: "git://github.com/crosstest/#{lib}.git", branch: branch
+    gem gem_name, git: "git://github.com/omnitest/#{lib}.git", branch: branch
   end
 end
 

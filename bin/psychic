@@ -1,4 +1,4 @@
 #!/usr/bin/env ruby
-require 'crosstest/psychic/cli'
+require 'omnitest/psychic/cli'
 
-Crosstest::Psychic::CLI.start
+Omnitest::Psychic::CLI.start

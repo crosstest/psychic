@@ -1,4 +1,4 @@
-Fabricator(:execution_result, from: Crosstest::Shell::ExecutionResult) do
+Fabricator(:execution_result, from: Omnitest::Shell::ExecutionResult) do
   initialize_with do
     @_klass.new @_transient_attributes
   end # Hash based initialization

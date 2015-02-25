@@ -2,7 +2,7 @@
 
 Psychic is a universal aliasing system for tasks and scripts. It provides a command-line tool to give humans easy-to-remember aliases for running tasks, and a API to give machines a standard way to interact with tasks and scripts across many projects.
 
-It is part of the [Crosstest](https://github.com/crosstest/crosstest) suite of tools.
+It is part of the [Omnitest](https://github.com/omnitest/omnitest) suite of tools.
 
 ## Warning
 
@@ -15,7 +15,7 @@ Psychic is installed as a gem. It's recommended that you install it with bunder.
 you Gemfile:
 
 ```ruby
-gem 'crosstest-psychic'
+gem 'omnitest-psychic'
 ```
 
 And run `bundle install`.
@@ -41,7 +41,7 @@ Psychic is similar. It will first look in `psychic.yaml` to see if you have expl
 Psychic has a simple API. You simply create a Psychic instance and then ask it for tasks or scripts:
 
 ```ruby
-psychic = Crosstest::Psychic.new
+psychic = Omnitest::Psychic.new
 
 # Find and execute the bootstrap task
 psychic.task('bootstrap').execute
@@ -57,7 +57,7 @@ psychic.script('hello world').source_file
 # => 'src/main/java/HelloWorld.java'
 ```
 
-See the full [API Documentation](http://www.rubydoc.info/github/crosstest/psychic) for more.
+See the full [API Documentation](http://www.rubydoc.info/github/omnitest/psychic) for more.
 
 ## CLI Usage
 
@@ -215,7 +215,7 @@ I, [2015-01-30T17:24:41.359478 #46319]  INFO -- :                               
 
 ## Acknowledgements
 
-Portions of the Crosstest projects were based on [rocco](https://github.com/rtomayko/rocco) projects, which was a port of [docco](https://github.com/jashkenas/docco).
+Portions of the Omnitest projects were based on [rocco](https://github.com/rtomayko/rocco) projects, which was a port of [docco](https://github.com/jashkenas/docco).
 
 A lot of code, and the style of the CLI tools, are based on heavily modified code adapted from [test-kitchen](https://github.com/test-kitchen/test-kitchen).
 
@@ -223,11 +223,11 @@ A lot of code, and the style of the CLI tools, are based on heavily modified cod
 
 ### Skeptic
 
-The [Skeptic](https://github.com/crosstest/skeptic) project is a companion to Psychic that tests the uses Psychic's script runner to test sample code. It captures and validates the output the exit code and output of the process, but can also capture additional data through "spies" like looking for HTTP calls it expects to see or files that should be created. So it let's you write assertions and reports on the behavior of code that's executed via Psychic.
+The [Skeptic](https://github.com/omnitest/skeptic) project is a companion to Psychic that tests the uses Psychic's script runner to test sample code. It captures and validates the output the exit code and output of the process, but can also capture additional data through "spies" like looking for HTTP calls it expects to see or files that should be created. So it let's you write assertions and reports on the behavior of code that's executed via Psychic.
 
-### Crosstest
+### Omnitest
 
-The [crosstest](https://github.com/crosstest/crosstest) project is for running tasks or tests across multiple projects. It uses Psychic (and Skeptic) in order to run the task in teach project, and then consolidates all of the results and produces reports.
+The [omnitest](https://github.com/omnitest/omnitest) project is for running tasks or tests across multiple projects. It uses Psychic (and Skeptic) in order to run the task in teach project, and then consolidates all of the results and produces reports.
 
 ## Contributing
 

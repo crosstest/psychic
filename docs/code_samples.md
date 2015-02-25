@@ -45,7 +45,7 @@ Source File:                          storage/upload_file.rb
 
 ### Custom Map
 
-You can tell Psychic exactly where to find a sample if it cannot be auto-detected. This is useful [crosstest](https://github.com/crosstest/crosstest) or any other situation where you want the same sample name to work across multiple projects even though the file names of the sample code have very different names.
+You can tell Psychic exactly where to find a sample if it cannot be auto-detected. This is useful [omnitest](https://github.com/omnitest/omnitest) or any other situation where you want the same sample name to work across multiple projects even though the file names of the sample code have very different names.
 
 You can do this by mapping sample names to files in your `psychic.yaml`. So you could add this:
 
@@ -58,7 +58,7 @@ Now `psychic show sample "upload file"` will find the correct sample, even thoug
 
 ### Listing Samples
 
-There is also a command for listing all known samples. See the [skeptic](https://github.com/crosstest/psychic-skeptic) project if you want to make ensure a project has a required set of samples.
+There is also a command for listing all known samples. See the [skeptic](https://github.com/omnitest/psychic-skeptic) project if you want to make ensure a project has a required set of samples.
 
 ```
 $ bundle exec psychic list samples
@@ -89,4 +89,4 @@ Psychic is able to run some code samples that require input. See the [Input docu
 
 ### Testing code samples
 
-You can use Psychic's companion project, [Skeptic](https://github.com/crosstest/psychic-skeptic) to test code samples.
+You can use Psychic's companion project, [Skeptic](https://github.com/omnitest/psychic-skeptic) to test code samples.

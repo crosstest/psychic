@@ -2,13 +2,13 @@ require 'simplecov'
 SimpleCov.start
 
 require 'rspec'
-require 'crosstest/psychic'
+require 'omnitest/psychic'
 require 'aruba'
 require 'aruba/api'
 require 'fabrication'
 
 # Includes shared examples
-require 'crosstest/psychic/execution/default_strategy_spec'
+require 'omnitest/psychic/execution/default_strategy_spec'
 
 # Config required for project
 RSpec.configure do | config |

@@ -1,4 +1,4 @@
-site_name: Crosstest::Psychic
+site_name: Omnitest::Psychic
 pages:
 - getting_started.md
 - running_tasks.md

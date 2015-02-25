@@ -23,7 +23,7 @@ Psychic exists to provide a common interface for tasks to build, test, and analy
 
 The [bootstrap consistency pattern](http://wynnnetherland.com/linked/2013012801/bootstrapping-consistency) is an example of that. It aims to provide "a consistent user experience to get from zero to productive on any new project". Similarly, Travis-CI gives you a consistent interface to test any software project. The command `travis run` will always build and test a project.
 
-Crosstest is an attempt to make a more generic framework for creating consistent user experiences across projects. That experienec can be "getting from zero to productive" like the bootstrap consistency pattern, "testing a change" like Travis-CI, or even something like "generating end of sprint reports" or "generating and previewing documentation".
+Omnitest is an attempt to make a more generic framework for creating consistent user experiences across projects. That experienec can be "getting from zero to productive" like the bootstrap consistency pattern, "testing a change" like Travis-CI, or even something like "generating end of sprint reports" or "generating and previewing documentation".
 
 In fact, the reason the project is called "psychic" is because it's supposed to seem like it's reading your mind. When you ask it to do something, like "bootstrap" a project, it should seem like it just magically picks the correct command to run. The project is actually more of a fraud than a clairvoyant - it just uses "[hot](http://en.wikipedia.org/wiki/Hot_reading)" and "[cold](http://en.wikipedia.org/wiki/Cold_reading)" reading tricks to pick the correct command.
 
@@ -50,7 +50,7 @@ Psychic's scope is broader, so there are things you could do with psychic that w
 - Issues that are assigned to you
 - Display `what_im_working_on.txt`
 
-The command could be setup so it would display a WIP report for any project, even if some projects are getting info from your local git branches, other from GitHub, and others from issue trackers like JIRA, Launchpad, or Mingle. This command obviously doesn't make sense on Travis-CI, especially if it's only showing the work in progress for a current developer, but could be very useful if you want to quickly review your WIP across several projects. That's what the [crosstest](https://github.com/crosstest/crosstest) tool's [crosstasking](https://github.com/crosstest/crosstest#crosstasking-via-psychic) feature is designed to do.
+The command could be setup so it would display a WIP report for any project, even if some projects are getting info from your local git branches, other from GitHub, and others from issue trackers like JIRA, Launchpad, or Mingle. This command obviously doesn't make sense on Travis-CI, especially if it's only showing the work in progress for a current developer, but could be very useful if you want to quickly review your WIP across several projects. That's what the [omnitest](https://github.com/omnitest/omnitest) tool's [crosstasking](https://github.com/omnitest/omnitest#crosstasking-via-psychic) feature is designed to do.
 
 #### Features
 
@@ -121,8 +121,8 @@ Psychic also has features to detect and run a code sample by alias, just like it
 
 ### Skeptic
 
-The [Skeptic](https://github.com/crosstest/skeptic) project is a companion to Psychic that tests the results code samples via Psychic. It captures and validates the output the exit code and output of the process, but can also capture additional data through "spies" like looking for HTTP calls it expects to see or files that should be created. So it let's you write assertions and reports on the behavior of code that's executed via Psychic.
+The [Skeptic](https://github.com/omnitest/skeptic) project is a companion to Psychic that tests the results code samples via Psychic. It captures and validates the output the exit code and output of the process, but can also capture additional data through "spies" like looking for HTTP calls it expects to see or files that should be created. So it let's you write assertions and reports on the behavior of code that's executed via Psychic.
 
-### Crosstest
+### Omnitest
 
-The [crosstest](https://github.com/crosstest/crosstest) project is for running tasks or tests across multiple projects. It uses Psychic (and Skeptic) in order to run the task in teach project, and then consolidates all of the results and produces reports.
+The [omnitest](https://github.com/omnitest/omnitest) project is for running tasks or tests across multiple projects. It uses Psychic (and Skeptic) in order to run the task in teach project, and then consolidates all of the results and produces reports.
