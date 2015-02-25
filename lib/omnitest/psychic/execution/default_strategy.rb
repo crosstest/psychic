@@ -20,7 +20,7 @@ module Omnitest
           super(command_params, shell_opts, *args)
         end
 
-        def build_command
+        def build_command # rubocop:disable Metrics/AbcSize
           return @command if defined? @command
 
           script_factory = psychic.script_factory_manager.factories_for(script).last

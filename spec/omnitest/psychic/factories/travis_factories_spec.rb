@@ -33,7 +33,7 @@ module Omnitest
               expect(subject.known_task? :bootstrap).to be true
             end
             it 'is true for test' do
-              expect(subject.known_task? :test).to be true
+              expect(subject.known_task? :unittest).to be true
             end
             it 'is false for lint' do
               expect(subject.known_task? :lint).to be false
@@ -51,12 +51,12 @@ module Omnitest
             end
           end
 
-          describe '#test' do
+          describe '#unittest' do
             it 'returns travis run script' do
               expect(shell).to receive(:execute).with('travis run --print --skip-version-check script', cwd: current_dir).and_return(
                 Fabricate(:execution_result, stdout: 'script from travis')
               )
-              expect(subject.task(:test)).to eq('script from travis')
+              expect(subject.task(:unittest)).to eq('script from travis')
             end
           end
         end
